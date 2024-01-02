@@ -9,7 +9,7 @@ Features:
 - [X] Order by
 - [X] Limit
 - [X] Offset
-- [ ] Specific field selection
+- [X] Specific field selection
 - [ ] Filtering
 - [ ] Relationships
 - [ ] Aggregates
