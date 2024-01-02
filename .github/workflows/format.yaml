@@ -1,6 +1,7 @@
 name: cargo fmt
 
 on:
+  merge_group:
   pull_request:
 
 jobs:
