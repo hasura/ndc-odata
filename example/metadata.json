@@ -23,8 +23,6 @@
             "Edm.Int",
             "Edm.Single",
             "Edm.String",
-            "Feature",
-            "PersonGender",
             "Trippin.AirportLocation",
             "Trippin.City",
             "Trippin.EventLocation",
