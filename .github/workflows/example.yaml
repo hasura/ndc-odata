@@ -23,6 +23,6 @@ jobs:
         with:
           time: '5' # seconds
 
-      - run: curl -X POST localhost:9100 -d "@example/metadata.json" > example/updated.json
+      - run: curl -X POST localhost:9100 -d "@example/metadata.json" -H "Content-Type: application/json" > example/updated.json
 
       - run: diff example/metadata.json example/updated.json
