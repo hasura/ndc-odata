@@ -29,6 +29,9 @@ jobs:
         with:
           path: main
 
+      - run: cargo build
+        working-directory: main
+
       - run: cargo run -- serve --configuration example/metadata.json &
         working-directory: main
 
