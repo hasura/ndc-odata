@@ -12,6 +12,8 @@ pub struct Endpoint {
 }
 
 impl Endpoint {
+    /// Parse a URL string into an `Endpoint` structure. We do this via the `http::Uri` builder,
+    /// and then break it up again (because we can't `Serialise`/`Deserialise` the builder itself).
     pub fn parse(input: &String) -> Result<Self, String> {
         let uri = input.parse::<Uri>().map_err(|x| x.to_string())?;
 
@@ -37,6 +39,7 @@ impl Endpoint {
         })
     }
 
+    /// Turn an `Endpoint` structure into a URL string.
     pub fn to_string(&self) -> String {
         Uri::builder()
             .scheme(self.protocol.as_str())
