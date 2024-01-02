@@ -12,11 +12,9 @@ indexmap = "2.1.0"
 itertools = "0.12.0"
 metadata = { path = "../metadata" }
 ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "7ac41c2" }
-odata-simple-client = "0.2.6"
 prometheus = "0.13.3"
 quick-xml = { version = "0.31.0", features = [ "overlapped-lists", "serialize" ] }
 reqwest = "0.11.23"
-schemars = "0.8.16"
 serde = "1.0.193"
 serde_json = "1.0.108"
 tokio = "1.35.1"
