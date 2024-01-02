@@ -1,7 +1,7 @@
-pub mod odata;
 pub mod ndc;
+pub mod odata;
 
-use std::collections::{ BTreeMap, BTreeSet };
+use std::collections::{BTreeMap, BTreeSet};
 
 /// Translate an EDMX document into the ndc-odata metadata type.
 pub fn prepare_odata_edmx(metadata: odata::EDMX) -> ndc::Schema {
@@ -20,7 +20,11 @@ pub fn prepare_odata_edmx(metadata: odata::EDMX) -> ndc::Schema {
         collections.append(&mut collection_additions);
     }
 
-    ndc::Schema { collections, object_types, scalar_types }
+    ndc::Schema {
+        collections,
+        object_types,
+        scalar_types,
+    }
 }
 
 /// OData's notion of entity sets maps pretty neatly onto the NDC notion of collections, so for
@@ -30,11 +34,9 @@ pub fn find_collections(schema: &odata::Schema) -> Vec<ndc::Collection> {
         .entity_container
         .entity_sets
         .iter()
-        .map(|entity_set| {
-            ndc::Collection {
-                name: entity_set.name.clone(),
-                collection_type: entity_set.name.clone(),
-            }
+        .map(|entity_set| ndc::Collection {
+            name: entity_set.name.clone(),
+            collection_type: entity_set.name.clone(),
         })
         .collect()
 }
@@ -49,27 +51,35 @@ pub fn find_scalar_types(schema: &odata::Schema) -> BTreeSet<String> {
         .iter()
         .flat_map(|entity_type| entity_type.properties.clone())
         .map(|property| property.r#type.inner.underlying_type())
-        .for_each(|inner| { scalar_types.insert(inner); });
+        .for_each(|inner| {
+            scalar_types.insert(inner);
+        });
 
     schema
         .complex_types
         .iter()
         .flat_map(|complex_type| complex_type.properties.clone())
         .map(|property| property.r#type.inner.underlying_type())
-        .for_each(|inner| { scalar_types.insert(inner); });
+        .for_each(|inner| {
+            scalar_types.insert(inner);
+        });
 
     schema
         .enum_types
         .iter()
         .map(|enum_type| enum_type.name.to_string())
-        .for_each(|name| { scalar_types.insert(name); });
+        .for_each(|name| {
+            scalar_types.insert(name);
+        });
 
     schema
         .entity_container
         .singletons
         .iter()
         .map(|singleton| singleton.r#type.inner.underlying_type())
-        .for_each(|inner| { scalar_types.insert(inner); });
+        .for_each(|inner| {
+            scalar_types.insert(inner);
+        });
 
     scalar_types
 }
@@ -96,17 +106,13 @@ pub fn find_object_types(schema: &odata::Schema) -> BTreeMap<String, ndc::Object
                 r#type: entity_type.name,
             };
 
-            let fields =
-                entity_type
-                    .properties
-                    .into_iter()
-                    .map(property_to_field)
-                    .collect();
+            let fields = entity_type
+                .properties
+                .into_iter()
+                .map(property_to_field)
+                .collect();
 
-            object_types.insert(
-                object_type.as_string(),
-                ndc::ObjectType { fields }
-            );
+            object_types.insert(object_type.as_string(), ndc::ObjectType { fields });
         });
 
     schema
@@ -119,23 +125,19 @@ pub fn find_object_types(schema: &odata::Schema) -> BTreeMap<String, ndc::Object
                 r#type: complex_type.name,
             };
 
-            let fields =
-                complex_type
-                    .properties
-                    .into_iter()
-                    .map(property_to_field)
-                    .collect();
+            let fields = complex_type
+                .properties
+                .into_iter()
+                .map(property_to_field)
+                .collect();
 
-            object_types.insert(
-                object_type.as_string(),
-                ndc::ObjectType { fields }
-            );
+            object_types.insert(object_type.as_string(), ndc::ObjectType { fields });
         });
 
     for entity_set in &schema.entity_container.entity_sets {
         match object_types.get(&entity_set.entity_type) {
             Some(object_type) => object_types.insert(entity_set.name.clone(), object_type.clone()),
-            None => panic!("Singular type {} should exist...", &entity_set.entity_type)
+            None => panic!("Singular type {} should exist...", &entity_set.entity_type),
         };
     }
 
@@ -149,31 +151,35 @@ pub fn find_object_types(schema: &odata::Schema) -> BTreeMap<String, ndc::Object
 /// mapping.
 fn type_description_to_type(input: &odata::TypeDescription) -> ndc::Type {
     match input {
-        odata::TypeDescription { nullable: true, inner } =>
-            ndc::Type::Nullable {
-                underlying_type: Box::new(
-                    type_description_to_type(
-                        &odata::TypeDescription {
-                            inner: inner.clone(),
-                            nullable: false
-                        }
-                    )
-                )
-            },
+        odata::TypeDescription {
+            nullable: true,
+            inner,
+        } => ndc::Type::Nullable {
+            underlying_type: Box::new(type_description_to_type(&odata::TypeDescription {
+                inner: inner.clone(),
+                nullable: false,
+            })),
+        },
 
-        odata::TypeDescription { nullable: _, inner: odata::types::Type::Collection { element_type } } =>
-            ndc::Type::Collection {
-                element_type: Box::new(
-                    type_description_to_type(
-                        &odata::TypeDescription {
-                            inner: *element_type.clone(),
-                            nullable: false
-                        }
-                    )
-                )
-            },
+        odata::TypeDescription {
+            nullable: _,
+            inner: odata::types::Type::Collection { element_type },
+        } => ndc::Type::Collection {
+            element_type: Box::new(type_description_to_type(&odata::TypeDescription {
+                inner: *element_type.clone(),
+                nullable: false,
+            })),
+        },
 
-        odata::TypeDescription { nullable: _, inner: odata::types::Type::Qualified { schema: _, r#type: _ } } =>
-            ndc::Type::Named { name: input.inner.underlying_type() }
+        odata::TypeDescription {
+            nullable: _,
+            inner:
+                odata::types::Type::Qualified {
+                    schema: _,
+                    r#type: _,
+                },
+        } => ndc::Type::Named {
+            name: input.inner.underlying_type(),
+        },
     }
 }

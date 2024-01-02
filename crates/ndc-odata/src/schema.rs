@@ -1,6 +1,6 @@
 use metadata::ndc;
 use ndc_sdk::models;
-use std::collections::{ BTreeMap, BTreeSet };
+use std::collections::{BTreeMap, BTreeSet};
 
 pub fn get_schema(configuration: &ndc::Configuration) -> models::SchemaResponse {
     models::SchemaResponse {
@@ -17,8 +17,11 @@ pub fn get_schema(configuration: &ndc::Configuration) -> models::SchemaResponse 
 
 /// Translate an `ndc-odata` collection into an `ndc-spec` collection.
 pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionInfo> {
-    let transform = |ndc::Collection { name, collection_type }: &ndc::Collection|  {
-        models:: CollectionInfo {
+    let transform = |ndc::Collection {
+                         name,
+                         collection_type,
+                     }: &ndc::Collection| {
+        models::CollectionInfo {
             name: name.clone(),
             collection_type: collection_type.clone(),
             description: None,
@@ -33,23 +36,31 @@ pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::
 
 /// Translate an `ndc-odata` object type into an `ndc-spec` collection.
 /// TODO: This seems messy; maybe I should learn more about iterators?
-pub fn translate_object_types(object_types: &BTreeMap<String, ndc::ObjectType>) -> BTreeMap<String, models::ObjectType> {
+pub fn translate_object_types(
+    object_types: &BTreeMap<String, ndc::ObjectType>,
+) -> BTreeMap<String, models::ObjectType> {
     let mut translated = BTreeMap::new();
 
     for (name, object_type) in object_types {
         let mut fields = BTreeMap::new();
 
         for (key, r#type) in &object_type.fields {
-            fields.insert(key.clone(), models::ObjectField {
-                description: None,
-                r#type: translate_type(r#type)
-            });
+            fields.insert(
+                key.clone(),
+                models::ObjectField {
+                    description: None,
+                    r#type: translate_type(r#type),
+                },
+            );
         }
 
-        translated.insert(name.clone(), models::ObjectType {
-            description: None,
-            fields
-        });
+        translated.insert(
+            name.clone(),
+            models::ObjectType {
+                description: None,
+                fields,
+            },
+        );
     }
 
     translated
@@ -57,34 +68,35 @@ pub fn translate_object_types(object_types: &BTreeMap<String, ndc::ObjectType>) 
 
 /// Translate an `ndc-odata` scalar type (currently just a `String`) into an `ndc-spec` scalar
 /// type.
-pub fn translate_scalar_types(scalar_types: &BTreeSet<String>) -> BTreeMap<String, models::ScalarType> {
-    let scalar_type = || {
-        models::ScalarType {
-            aggregate_functions: BTreeMap::new(),
-            comparison_operators: BTreeMap::new(),
-        }
+pub fn translate_scalar_types(
+    scalar_types: &BTreeSet<String>,
+) -> BTreeMap<String, models::ScalarType> {
+    let scalar_type = || models::ScalarType {
+        aggregate_functions: BTreeMap::new(),
+        comparison_operators: BTreeMap::new(),
     };
 
-    scalar_types.iter().map(|name| (name.clone(), scalar_type())).collect()
+    scalar_types
+        .iter()
+        .map(|name| (name.clone(), scalar_type()))
+        .collect()
 }
-
 
 // Helpers
 
 /// Translate an `ndc-odata` type into an `ndc-spec` type. They're basically identical.
-fn translate_type (r#type: &ndc::Type) -> models::Type {
+fn translate_type(r#type: &ndc::Type) -> models::Type {
     match r#type {
-        ndc::Type::Named { name } =>
-            models::Type::Named { name: name.to_string() },
+        ndc::Type::Named { name } => models::Type::Named {
+            name: name.to_string(),
+        },
 
-        ndc::Type::Nullable { underlying_type } =>
-            models::Type::Nullable {
-                underlying_type: Box::new(translate_type(&*underlying_type))
-            },
+        ndc::Type::Nullable { underlying_type } => models::Type::Nullable {
+            underlying_type: Box::new(translate_type(&*underlying_type)),
+        },
 
-        ndc::Type::Collection { element_type } =>
-            models::Type::Array {
-                element_type: Box::new(translate_type(&*element_type))
-            },
+        ndc::Type::Collection { element_type } => models::Type::Array {
+            element_type: Box::new(translate_type(&*element_type)),
+        },
     }
 }
