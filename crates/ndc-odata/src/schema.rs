@@ -71,15 +71,19 @@ pub fn translate_object_types(
 pub fn translate_scalar_types(
     scalar_types: &BTreeSet<String>,
 ) -> BTreeMap<String, models::ScalarType> {
-    let scalar_type = || models::ScalarType {
-        aggregate_functions: BTreeMap::new(),
-        comparison_operators: BTreeMap::new(),
-    };
+    let mut translated = BTreeMap::new();
 
-    scalar_types
-        .iter()
-        .map(|name| (name.clone(), scalar_type()))
-        .collect()
+    for name in scalar_types {
+        translated.insert(
+            name.clone(),
+            models::ScalarType {
+                aggregate_functions: BTreeMap::new(),
+                comparison_operators: BTreeMap::new(),
+            },
+        );
+    }
+
+    translated
 }
 
 // Helpers

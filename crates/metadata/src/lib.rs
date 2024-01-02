@@ -137,7 +137,7 @@ pub fn find_object_types(schema: &odata::Schema) -> BTreeMap<String, ndc::Object
     for entity_set in &schema.entity_container.entity_sets {
         match object_types.get(&entity_set.entity_type) {
             Some(object_type) => object_types.insert(entity_set.name.clone(), object_type.clone()),
-            None => panic!("Singular type {} should exist...", &entity_set.entity_type),
+            None => None, // panic!("Singular type {} should exist...", &entity_set.entity_type),
         };
     }
 
