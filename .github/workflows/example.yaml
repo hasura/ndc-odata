@@ -1,4 +1,4 @@
-name: check reference metadata
+name: check example metadata
 
 on:
   merge_group:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   check-metadata:
-    name: check metadata
+    name: check example metadata
     runs-on: ubuntu-latest
     steps:
       - uses: actions-rs/toolchain@v1
@@ -15,7 +15,13 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - run: cargo build
+
       - run: cargo run -- configuration serve &
+
+      - uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '5' # seconds
 
       - run: curl -X POST localhost:9100 -d "@example/metadata.json" > example/updated.json
 
