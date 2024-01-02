@@ -6,6 +6,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+http = "1.0.0"
 pest = "2.7.5"
 pest_derive = "2.7.5"
 schemars = "0.8.16"

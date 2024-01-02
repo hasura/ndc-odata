@@ -1,16 +1,24 @@
+pub mod url;
+
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct Configuration {
+    pub api_endpoint: url::Endpoint,
+    pub schema: Schema,
+}
+
+#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+pub struct RawConfiguration {
     pub api_endpoint: String,
     pub schema: Schema,
 }
 
-impl Default for Configuration {
+impl Default for RawConfiguration {
     fn default() -> Self {
-        Configuration {
+        RawConfiguration {
             api_endpoint: Default::default(),
             schema: Default::default(),
         }
