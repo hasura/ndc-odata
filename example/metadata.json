@@ -1,0 +1,440 @@
+{
+    "api_endpoint": "https://services.odata.org/TripPinRESTierService",
+    "schema": {
+        "collections": [
+            {
+                "name": "People",
+                "collection_type": "People"
+            },
+            {
+                "name": "Airlines",
+                "collection_type": "Airlines"
+            },
+            {
+                "name": "Airports",
+                "collection_type": "Airports"
+            }
+        ],
+        "scalar_types": [
+            "Edm.DateTimeOffset",
+            "Edm.Duration",
+            "Edm.GeographyPoint",
+            "Edm.Guid",
+            "Edm.Int",
+            "Edm.Single",
+            "Edm.String",
+            "Feature",
+            "PersonGender",
+            "Trippin.AirportLocation",
+            "Trippin.City",
+            "Trippin.EventLocation",
+            "Trippin.Feature",
+            "Trippin.Location",
+            "Trippin.Person",
+            "Trippin.PersonGender"
+        ],
+        "object_types": {
+            "Airlines": {
+                "fields": {
+                    "AirlineCode": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Name": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Airports": {
+                "fields": {
+                    "IataCode": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "IcaoCode": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Location": {
+                        "Named": {
+                            "name": "Trippin.AirportLocation"
+                        }
+                    },
+                    "Name": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "People": {
+                "fields": {
+                    "AddressInfo": {
+                        "Collection": {
+                            "element_type": {
+                                "Named": {
+                                    "name": "Trippin.Location"
+                                }
+                            }
+                        }
+                    },
+                    "Age": {
+                        "Named": {
+                            "name": "Edm.Int"
+                        }
+                    },
+                    "Emails": {
+                        "Collection": {
+                            "element_type": {
+                                "Named": {
+                                    "name": "Edm.String"
+                                }
+                            }
+                        }
+                    },
+                    "FavoriteFeature": {
+                        "Named": {
+                            "name": "Trippin.Feature"
+                        }
+                    },
+                    "Features": {
+                        "Collection": {
+                            "element_type": {
+                                "Named": {
+                                    "name": "Trippin.Feature"
+                                }
+                            }
+                        }
+                    },
+                    "FirstName": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Gender": {
+                        "Named": {
+                            "name": "Trippin.PersonGender"
+                        }
+                    },
+                    "HomeAddress": {
+                        "Named": {
+                            "name": "Trippin.Location"
+                        }
+                    },
+                    "LastName": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "MiddleName": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "UserName": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Trippin.Airline": {
+                "fields": {
+                    "AirlineCode": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Name": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Trippin.Airport": {
+                "fields": {
+                    "IataCode": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "IcaoCode": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Location": {
+                        "Named": {
+                            "name": "Trippin.AirportLocation"
+                        }
+                    },
+                    "Name": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Trippin.AirportLocation": {
+                "fields": {
+                    "Loc": {
+                        "Named": {
+                            "name": "Edm.GeographyPoint"
+                        }
+                    }
+                }
+            },
+            "Trippin.City": {
+                "fields": {
+                    "CountryRegion": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Name": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Region": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Trippin.Employee": {
+                "fields": {
+                    "Cost": {
+                        "Named": {
+                            "name": "Edm.Int"
+                        }
+                    }
+                }
+            },
+            "Trippin.Event": {
+                "fields": {
+                    "Description": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "OccursAt": {
+                        "Named": {
+                            "name": "Trippin.EventLocation"
+                        }
+                    }
+                }
+            },
+            "Trippin.EventLocation": {
+                "fields": {
+                    "BuildingInfo": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Trippin.Flight": {
+                "fields": {
+                    "FlightNumber": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Trippin.Location": {
+                "fields": {
+                    "Address": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "City": {
+                        "Named": {
+                            "name": "Trippin.City"
+                        }
+                    }
+                }
+            },
+            "Trippin.Manager": {
+                "fields": {
+                    "BossOffice": {
+                        "Named": {
+                            "name": "Trippin.Location"
+                        }
+                    },
+                    "Budget": {
+                        "Named": {
+                            "name": "Edm.Int"
+                        }
+                    }
+                }
+            },
+            "Trippin.Person": {
+                "fields": {
+                    "AddressInfo": {
+                        "Collection": {
+                            "element_type": {
+                                "Named": {
+                                    "name": "Trippin.Location"
+                                }
+                            }
+                        }
+                    },
+                    "Age": {
+                        "Named": {
+                            "name": "Edm.Int"
+                        }
+                    },
+                    "Emails": {
+                        "Collection": {
+                            "element_type": {
+                                "Named": {
+                                    "name": "Edm.String"
+                                }
+                            }
+                        }
+                    },
+                    "FavoriteFeature": {
+                        "Named": {
+                            "name": "Trippin.Feature"
+                        }
+                    },
+                    "Features": {
+                        "Collection": {
+                            "element_type": {
+                                "Named": {
+                                    "name": "Trippin.Feature"
+                                }
+                            }
+                        }
+                    },
+                    "FirstName": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Gender": {
+                        "Named": {
+                            "name": "Trippin.PersonGender"
+                        }
+                    },
+                    "HomeAddress": {
+                        "Named": {
+                            "name": "Trippin.Location"
+                        }
+                    },
+                    "LastName": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "MiddleName": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "UserName": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Trippin.PlanItem": {
+                "fields": {
+                    "ConfirmationCode": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "Duration": {
+                        "Named": {
+                            "name": "Edm.Duration"
+                        }
+                    },
+                    "EndsAt": {
+                        "Named": {
+                            "name": "Edm.DateTimeOffset"
+                        }
+                    },
+                    "PlanItemId": {
+                        "Named": {
+                            "name": "Edm.Int"
+                        }
+                    },
+                    "StartsAt": {
+                        "Named": {
+                            "name": "Edm.DateTimeOffset"
+                        }
+                    }
+                }
+            },
+            "Trippin.PublicTransportation": {
+                "fields": {
+                    "SeatNumber": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    }
+                }
+            },
+            "Trippin.Trip": {
+                "fields": {
+                    "Budget": {
+                        "Named": {
+                            "name": "Edm.Single"
+                        }
+                    },
+                    "Description": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "EndsAt": {
+                        "Named": {
+                            "name": "Edm.DateTimeOffset"
+                        }
+                    },
+                    "Name": {
+                        "Named": {
+                            "name": "Edm.String"
+                        }
+                    },
+                    "ShareId": {
+                        "Named": {
+                            "name": "Edm.Guid"
+                        }
+                    },
+                    "StartsAt": {
+                        "Named": {
+                            "name": "Edm.DateTimeOffset"
+                        }
+                    },
+                    "Tags": {
+                        "Collection": {
+                            "element_type": {
+                                "Named": {
+                                    "name": "Edm.String"
+                                }
+                            }
+                        }
+                    },
+                    "TripId": {
+                        "Named": {
+                            "name": "Edm.Int"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

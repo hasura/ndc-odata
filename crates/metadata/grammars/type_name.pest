@@ -1,0 +1,19 @@
+// A name is made up of at least one component, which is just a series of
+// alphabetical characters.  We consider every component but the last to
+// represent the namespace.
+component = { ASCII_ALPHA+ }
+
+// The name of a type is just a series of period-separated components. The
+// OData spec doesn't say much about the format of these identifiers, so this
+// is a guess based on what I've seen in the wild.
+qualified_name = _{ (component ~ ".")* ~ component }
+
+// A collection of type `T` is written as `Collection(T)`. Note that an entity
+// set might define a name for these (e.g. a collection of `Person` could be
+// called `People`, but the _type_ of that entity set would be
+// `Collection(Person)`.
+collection = { "Collection(" ~ qualified_name ~ ")" }
+
+// A type is either a collection of a qualified name, or just a singular
+// qualified name.
+type_name = _{ collection | qualified_name }
