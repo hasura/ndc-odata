@@ -3,9 +3,9 @@
 
 pub mod types;
 
-use schemars::JsonSchema;
-use serde::{ Deserialize, Serialize };
 use crate::odata::types::Type;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct EDMX {
@@ -23,7 +23,7 @@ pub struct EDMX {
 pub struct DataServices {
     #[serde(default)]
     #[serde(rename = "Schema")]
-    pub schema: Vec<Schema>
+    pub schema: Vec<Schema>,
 }
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
@@ -121,7 +121,7 @@ pub struct EnumType {
     pub name: String,
 
     #[serde(rename = "Member")]
-    pub members: Vec<Member>
+    pub members: Vec<Member>,
 }
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
@@ -230,7 +230,7 @@ pub struct NavigationPropertyBinding {
     pub path: String,
 
     #[serde(rename = "@Target")]
-    pub target: String
+    pub target: String,
 }
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
@@ -255,7 +255,7 @@ pub struct FunctionImport {
     pub function: String,
 
     #[serde(rename = "@EntitySet")]
-    pub entity_set: Option<String>
+    pub entity_set: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
@@ -267,7 +267,7 @@ pub struct ActionImport {
     pub action: String,
 
     #[serde(rename = "@EntitySet")]
-    pub entity_set: Option<String>
+    pub entity_set: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]

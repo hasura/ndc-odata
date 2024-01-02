@@ -1,6 +1,6 @@
 use itertools::Itertools;
-use url_builder::URLBuilder;
 use ndc_sdk::models;
+use url_builder::URLBuilder;
 
 pub fn request_to_url(builder: &mut URLBuilder, request: &models::QueryRequest) {
     builder.add_route(&request.collection);
@@ -11,12 +11,14 @@ pub fn request_to_url(builder: &mut URLBuilder, request: &models::QueryRequest) 
             &fields
                 .values()
                 .filter_map(|field| match field {
-                    models::Field::Column { column } =>
-                        Some(column),
-                    models::Field::Relationship { query: _, relationship: _, arguments: _ } =>
-                        None,
+                    models::Field::Column { column } => Some(column),
+                    models::Field::Relationship {
+                        query: _,
+                        relationship: _,
+                        arguments: _,
+                    } => None,
                 })
-                .join(", ")
+                .join(", "),
         );
     }
 
@@ -36,14 +38,20 @@ pub fn request_to_url(builder: &mut URLBuilder, request: &models::QueryRequest) 
 
 fn order_element_to_param(element: &models::OrderByElement) -> Option<String> {
     match &element.target {
-        models::OrderByTarget::Column { name, path: _ } =>
-            format!("{} {}", name, match element.order_direction {
+        models::OrderByTarget::Column { name, path: _ } => format!(
+            "{} {}",
+            name,
+            match element.order_direction {
                 models::OrderDirection::Asc => "asc",
                 models::OrderDirection::Desc => "desc",
-            }).into(),
-        models::OrderByTarget::StarCountAggregate { path: _ } =>
-            None,
-        models::OrderByTarget::SingleColumnAggregate { column: _, function: _, path: _ } =>
-            None,
+            }
+        )
+        .into(),
+        models::OrderByTarget::StarCountAggregate { path: _ } => None,
+        models::OrderByTarget::SingleColumnAggregate {
+            column: _,
+            function: _,
+            path: _,
+        } => None,
     }
 }
