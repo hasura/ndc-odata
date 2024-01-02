@@ -15,4 +15,5 @@ jobs:
         with:
           toolchain: stable
 
+      - run: cargo install cargo-machete
       - run: cargo machete
