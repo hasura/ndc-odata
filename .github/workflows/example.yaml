@@ -1,0 +1,28 @@
+name: check example metadata
+
+on:
+  merge_group:
+  pull_request:
+
+jobs:
+  check-metadata:
+    name: check example metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - uses: actions/checkout@v4
+
+      - run: cargo build
+
+      - run: cargo run -- configuration serve &
+
+      - uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '5' # seconds
+
+      - run: curl -X POST localhost:9100 -d "@example/metadata.json" -H "Content-Type: application/json" > example/updated.json
+
+      - run: diff example/metadata.json example/updated.json
