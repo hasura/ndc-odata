@@ -69,7 +69,9 @@ pub fn find_scalar_types(schema: &odata::Schema) -> BTreeSet<String> {
         .iter()
         .map(|enum_type| enum_type.name.to_string())
         .map(|name| format!("{}.{}", schema.namespace, name))
-        .for_each(|scalar_type| { scalar_types.insert(scalar_type); });
+        .for_each(|scalar_type| {
+            scalar_types.insert(scalar_type);
+        });
 
     schema
         .entity_container
