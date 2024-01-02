@@ -74,10 +74,13 @@ pub fn translate_scalar_types(
     let mut translated = BTreeMap::new();
 
     for name in scalar_types {
-        translated.insert(name.clone(), models::ScalarType {
-            aggregate_functions: BTreeMap::new(),
-            comparison_operators: BTreeMap::new(),
-        });
+        translated.insert(
+            name.clone(),
+            models::ScalarType {
+                aggregate_functions: BTreeMap::new(),
+                comparison_operators: BTreeMap::new(),
+            },
+        );
     }
 
     translated

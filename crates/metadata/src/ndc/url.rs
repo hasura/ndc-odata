@@ -6,9 +6,9 @@ use serde::{Deserialize, Serialize};
 /// components in a new structure and feed them into a Uri builder when we need them.
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct Endpoint {
-   pub protocol: String,
-   pub authority: String,
-   pub path: String,
+    pub protocol: String,
+    pub authority: String,
+    pub path: String,
 }
 
 impl Endpoint {
@@ -17,7 +17,7 @@ impl Endpoint {
 
         let protocol: String = match uri.scheme_str() {
             Some(protocol) => protocol.to_string(),
-            None => "API endpoint URL is missing a protocol".to_string()
+            None => "API endpoint URL is missing a protocol".to_string(),
         };
 
         let authority: String = match uri.authority() {
@@ -30,7 +30,11 @@ impl Endpoint {
             None => String::new(),
         };
 
-        Ok (Self { protocol, authority, path })
+        Ok(Self {
+            protocol,
+            authority,
+            path,
+        })
     }
 
     pub fn to_string(&self) -> String {
