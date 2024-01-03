@@ -9,6 +9,10 @@ jobs:
     name: cargo machete
     runs-on: ubuntu-latest
     steps:
+      - uses: extractions/setup-just@v1
+        with:
+          just-version: 0.10.5
+
       - uses: actions/checkout@v4
 
       - uses: actions-rs/toolchain@v1
@@ -16,4 +20,5 @@ jobs:
           toolchain: stable
 
       - run: cargo install cargo-machete
-      - run: cargo machete
+
+      - run: just machete
