@@ -37,8 +37,23 @@ pub fn find_collections(schema: &odata::Schema) -> Vec<ndc::Collection> {
         .map(|entity_set| ndc::Collection {
             name: entity_set.name.clone(),
             collection_type: entity_set.entity_type.clone(),
+            key: type_key(schema, &entity_set.entity_type)
         })
         .collect()
+}
+
+/// Given an entity typ name, check the schema to see whether it has a uniquely identifying key.
+fn type_key(schema: &odata::Schema, name: &String) -> Option<String> {
+    let matches = |entity: &&odata::EntityType| {
+        &format!("{}.{}", schema.namespace, entity.name) == name
+    };
+
+    schema
+        .entity_types
+        .iter()
+        .find(matches)
+        .and_then(|entity_type| entity_type.key.clone())
+        .map(|odata_key| odata_key.property_ref.name)
 }
 
 /// Traverse the EDMX document looking for scalar types. If collections are found, the singular
