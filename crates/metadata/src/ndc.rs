@@ -59,6 +59,7 @@ pub struct ObjectType {
 }
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[serde(tag = "type")]
 pub enum Type {
     Collection { element_type: Box<Type> },
     Nullable { underlying_type: Box<Type> },
