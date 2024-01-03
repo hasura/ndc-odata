@@ -23,9 +23,12 @@ pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::
         if let Some(field) = &collection.key {
             let relationship = format!("{}_by_{}", &collection.name, &field);
 
-            uniqueness_constraints.insert(relationship, models::UniquenessConstraint {
-                unique_columns: Vec::from([ field.clone() ]),
-            });
+            uniqueness_constraints.insert(
+                relationship,
+                models::UniquenessConstraint {
+                    unique_columns: Vec::from([field.clone()]),
+                },
+            );
         }
 
         models::CollectionInfo {
@@ -34,7 +37,7 @@ pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::
             description: None,
             arguments: BTreeMap::new(),
             foreign_keys: BTreeMap::new(),
-            uniqueness_constraints
+            uniqueness_constraints,
         }
     };
 
