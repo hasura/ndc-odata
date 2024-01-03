@@ -9,20 +9,24 @@ jobs:
     name: check example metadata
     runs-on: ubuntu-latest
     steps:
+      - uses: extractions/setup-just@v1
+        with:
+          just-version: 0.10.5
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
 
       - uses: actions/checkout@v4
 
-      - run: cargo build
+      - run: just build
 
-      - run: cargo run -- configuration serve &
+      - run: just configuration-server &
 
       - uses: GuillaumeFalourd/wait-sleep-action@v1
         with:
           time: '5' # seconds
 
-      - run: curl -X POST localhost:9100 -d "@example/metadata.json" -H "Content-Type: application/json" > example/updated.json
+      - run: just update-example-metadata
 
-      - run: diff example/metadata.json example/updated.json
+      - run: git diff
