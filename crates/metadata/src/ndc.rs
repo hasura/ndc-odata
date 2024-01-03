@@ -13,6 +13,8 @@ pub struct Configuration {
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct RawConfiguration {
     pub api_endpoint: String,
+
+    #[serde(default)]
     pub schema: Schema,
 }
 
