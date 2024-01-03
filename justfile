@@ -14,8 +14,11 @@ machete:
 test:
   @cargo test
 
-configuration-server:
-  @cargo run -- --configuration serve
+run-configuration-server:
+  @cargo run -- configuration serve
+alias config := run-configuration-server
+alias config-server := run-configuration-server
+alias configuration-server := run-configuration-server
 
 start metadata="example/metadata.json":
   @cargo run -- serve --configuration {{metadata}}
