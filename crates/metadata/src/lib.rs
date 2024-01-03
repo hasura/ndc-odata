@@ -36,7 +36,7 @@ pub fn find_collections(schema: &odata::Schema) -> Vec<ndc::Collection> {
         .iter()
         .map(|entity_set| ndc::Collection {
             name: entity_set.name.clone(),
-            collection_type: entity_set.name.clone(),
+            collection_type: entity_set.entity_type.clone(),
         })
         .collect()
 }
@@ -134,13 +134,6 @@ pub fn find_object_types(schema: &odata::Schema) -> BTreeMap<String, ndc::Object
 
             object_types.insert(object_type.as_string(), ndc::ObjectType { fields });
         });
-
-    for entity_set in &schema.entity_container.entity_sets {
-        match object_types.get(&entity_set.entity_type) {
-            Some(object_type) => object_types.insert(entity_set.name.clone(), object_type.clone()),
-            None => None, // panic!("Singular type {} should exist...", &entity_set.entity_type),
-        };
-    }
 
     object_types
 }
