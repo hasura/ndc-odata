@@ -4,14 +4,17 @@
     "collections": [
       {
         "name": "People",
+        "key": "UserName",
         "collection_type": "Trippin.Person"
       },
       {
         "name": "Airlines",
+        "key": "AirlineCode",
         "collection_type": "Trippin.Airline"
       },
       {
         "name": "Airports",
+        "key": "IcaoCode",
         "collection_type": "Trippin.Airport"
       }
     ],

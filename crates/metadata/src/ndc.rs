@@ -50,6 +50,7 @@ impl Default for Schema {
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct Collection {
     pub name: String,
+    pub key: Option<String>,
     pub collection_type: String,
 }
 
