@@ -55,6 +55,7 @@ pub struct Collection {
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct ObjectType {
+    #[serde(flatten)]
     pub fields: BTreeMap<String, Type>,
 }
 
