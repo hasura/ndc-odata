@@ -1,0 +1,32 @@
+name: check example metadata
+
+on:
+  merge_group:
+  pull_request:
+
+jobs:
+  check-metadata:
+    name: check example metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: extractions/setup-just@v1
+        with:
+          just-version: 0.10.5
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - uses: actions/checkout@v4
+
+      - run: just build
+
+      - run: just configuration-server &
+
+      - uses: GuillaumeFalourd/wait-sleep-action@v1
+        with:
+          time: '5' # seconds
+
+      - run: just update-example-metadata
+
+      - run: git diff

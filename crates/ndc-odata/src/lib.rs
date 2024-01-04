@@ -12,7 +12,7 @@ pub struct OData {}
 
 #[async_trait::async_trait]
 impl connector::Connector for OData {
-    type RawConfiguration = metadata::ndc::Configuration;
+    type RawConfiguration = metadata::ndc::RawConfiguration;
     type Configuration = metadata::ndc::Configuration;
     type State = ();
 
@@ -23,7 +23,7 @@ impl connector::Connector for OData {
     async fn update_configuration(
         configuration: Self::RawConfiguration,
     ) -> Result<Self::RawConfiguration, connector::UpdateConfigurationError> {
-        Ok(metadata::ndc::Configuration {
+        Ok(metadata::ndc::RawConfiguration {
             api_endpoint: configuration.api_endpoint.clone(),
             schema: configuration::fetch_metadata(&configuration.api_endpoint).await?,
         })
@@ -32,7 +32,7 @@ impl connector::Connector for OData {
     async fn validate_raw_configuration(
         configuration: Self::RawConfiguration,
     ) -> Result<Self::Configuration, connector::ValidateError> {
-        match configuration.api_endpoint.parse() {
+        match metadata::ndc::url::Endpoint::parse(&configuration.api_endpoint) {
             Ok(uri) => Ok(metadata::ndc::Configuration {
                 api_endpoint: uri,
                 schema: configuration.schema,

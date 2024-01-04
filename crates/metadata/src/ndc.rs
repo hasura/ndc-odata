@@ -1,16 +1,26 @@
+pub mod url;
+
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct Configuration {
-    pub api_endpoint: String,
+    pub api_endpoint: url::Endpoint,
     pub schema: Schema,
 }
 
-impl Default for Configuration {
+#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+pub struct RawConfiguration {
+    pub api_endpoint: String,
+
+    #[serde(default)]
+    pub schema: Schema,
+}
+
+impl Default for RawConfiguration {
     fn default() -> Self {
-        Configuration {
+        RawConfiguration {
             api_endpoint: Default::default(),
             schema: Default::default(),
         }
@@ -40,6 +50,7 @@ impl Default for Schema {
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct Collection {
     pub name: String,
+    pub key: Option<String>,
     pub collection_type: String,
 }
 
@@ -49,6 +60,7 @@ pub struct ObjectType {
 }
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[serde(tag = "type")]
 pub enum Type {
     Collection { element_type: Box<Type> },
     Nullable { underlying_type: Box<Type> },

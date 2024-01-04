@@ -17,17 +17,27 @@ pub fn get_schema(configuration: &ndc::Configuration) -> models::SchemaResponse 
 
 /// Translate an `ndc-odata` collection into an `ndc-spec` collection.
 pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionInfo> {
-    let transform = |ndc::Collection {
-                         name,
-                         collection_type,
-                     }: &ndc::Collection| {
+    let transform = |collection: &ndc::Collection| {
+        let mut uniqueness_constraints = BTreeMap::new();
+
+        if let Some(field) = &collection.key {
+            let relationship = format!("{}_by_{}", &collection.name, &field);
+
+            uniqueness_constraints.insert(
+                relationship,
+                models::UniquenessConstraint {
+                    unique_columns: Vec::from([field.clone()]),
+                },
+            );
+        }
+
         models::CollectionInfo {
-            name: name.clone(),
-            collection_type: collection_type.clone(),
+            name: collection.name.clone(),
+            collection_type: collection.collection_type.clone(),
             description: None,
             arguments: BTreeMap::new(),
             foreign_keys: BTreeMap::new(),
-            uniqueness_constraints: BTreeMap::new(),
+            uniqueness_constraints,
         }
     };
 
@@ -71,15 +81,19 @@ pub fn translate_object_types(
 pub fn translate_scalar_types(
     scalar_types: &BTreeSet<String>,
 ) -> BTreeMap<String, models::ScalarType> {
-    let scalar_type = || models::ScalarType {
-        aggregate_functions: BTreeMap::new(),
-        comparison_operators: BTreeMap::new(),
-    };
+    let mut translated = BTreeMap::new();
 
-    scalar_types
-        .iter()
-        .map(|name| (name.clone(), scalar_type()))
-        .collect()
+    for name in scalar_types {
+        translated.insert(
+            name.clone(),
+            models::ScalarType {
+                aggregate_functions: BTreeMap::new(),
+                comparison_operators: BTreeMap::new(),
+            },
+        );
+    }
+
+    translated
 }
 
 // Helpers

@@ -1,6 +1,5 @@
 pub mod request;
 
-use http::Uri;
 use indexmap::IndexMap;
 use metadata::ndc;
 use ndc_sdk::{connector, models};
@@ -21,21 +20,14 @@ pub async fn execute_query(
 ) -> Result<models::QueryResponse, connector::QueryError> {
     let mut builder = URLBuilder::new();
 
-    // TODO: I don't feel good about the parsing here - we should probably do this when we validate
-    // the configuration, given that we're going to have to do a lot of fumbling around with URLs
-    // to make sure everything works.
-    let uri = configuration.api_endpoint.parse::<Uri>().unwrap();
-
     builder
-        .set_protocol(uri.scheme_str().unwrap())
-        .set_host(uri.host().unwrap())
-        .add_route(uri.path());
+        .set_protocol(&configuration.api_endpoint.protocol)
+        .set_host(&configuration.api_endpoint.authority)
+        .add_route(&configuration.api_endpoint.path);
 
     request::request_to_url(&mut builder, &request);
-
     let built = builder.build();
 
-    println!("{}", built);
     let body: Response = reqwest::get(built)
         .await
         .map_err(Box::from)
@@ -45,11 +37,9 @@ pub async fn execute_query(
         .map_err(Box::from)
         .map_err(connector::QueryError::Other)?;
 
-    let rows = body.value.into_iter().map(prepare_row).collect();
-
     Ok(models::QueryResponse(Vec::from([models::RowSet {
+        rows: Some(body.value.into_iter().map(prepare_row).collect()),
         aggregates: None,
-        rows: Some(rows),
     }])))
 }
 

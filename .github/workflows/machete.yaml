@@ -1,12 +1,12 @@
-name: cargo fmt
+name: cargo machete
 
 on:
   merge_group:
   pull_request:
 
 jobs:
-  cargo-fmt:
-    name: cargo fmt
+  cargo-machete:
+    name: cargo machete
     runs-on: ubuntu-latest
     steps:
       - uses: extractions/setup-just@v1
@@ -19,4 +19,6 @@ jobs:
         with:
           toolchain: stable
 
-      - run: just format
+      - run: cargo install cargo-machete
+
+      - run: just machete

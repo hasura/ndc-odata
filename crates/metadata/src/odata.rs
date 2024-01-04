@@ -4,10 +4,9 @@
 pub mod types;
 
 use crate::odata::types::Type;
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer};
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct EDMX {
     #[serde(rename = "@Version")]
     pub version: String,
@@ -19,14 +18,14 @@ pub struct EDMX {
     pub data_services: DataServices,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct DataServices {
     #[serde(default)]
     #[serde(rename = "Schema")]
     pub schema: Vec<Schema>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Schema {
     #[serde(rename = "@Namespace")]
     pub namespace: String,
@@ -55,7 +54,7 @@ pub struct Schema {
     pub entity_container: EntityContainer,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct EntityType {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -72,19 +71,19 @@ pub struct EntityType {
     pub navigation_properties: Vec<NavigationProperty>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Key {
     #[serde(rename = "PropertyRef")]
     pub property_ref: PropertyRef,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct PropertyRef {
     #[serde(rename = "@Name")]
     pub name: String,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Property {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -93,7 +92,7 @@ pub struct Property {
     pub r#type: TypeDescription,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct NavigationProperty {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -102,7 +101,7 @@ pub struct NavigationProperty {
     pub r#type: TypeDescription,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct ComplexType {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -115,7 +114,7 @@ pub struct ComplexType {
     pub properties: Vec<Property>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct EnumType {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -124,7 +123,7 @@ pub struct EnumType {
     pub members: Vec<Member>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Member {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -133,7 +132,7 @@ pub struct Member {
     pub value: u32,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Function {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -153,7 +152,7 @@ pub struct Function {
     pub is_bound: bool,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Parameter {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -162,13 +161,13 @@ pub struct Parameter {
     pub r#type: TypeDescription,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct ReturnType {
     #[serde(flatten)]
     pub r#type: TypeDescription,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Action {
     #[serde(rename = "@Name")]
@@ -189,7 +188,7 @@ pub struct Action {
     pub entity_set_path: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct EntityContainer {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -211,7 +210,7 @@ pub struct EntityContainer {
     pub action_imports: Vec<ActionImport>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct EntitySet {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -224,7 +223,7 @@ pub struct EntitySet {
     pub navigation_property_bindings: Vec<NavigationPropertyBinding>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct NavigationPropertyBinding {
     #[serde(rename = "@Path")]
     pub path: String,
@@ -233,7 +232,7 @@ pub struct NavigationPropertyBinding {
     pub target: String,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct Singleton {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -246,7 +245,7 @@ pub struct Singleton {
     pub navigation_property_bindings: Vec<NavigationPropertyBinding>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct FunctionImport {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -258,7 +257,7 @@ pub struct FunctionImport {
     pub entity_set: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct ActionImport {
     #[serde(rename = "@Name")]
     pub name: String,
@@ -270,12 +269,21 @@ pub struct ActionImport {
     pub entity_set: Option<String>,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct TypeDescription {
     #[serde(rename = "@Type")]
     pub inner: Type,
 
-    #[serde(default)]
-    // #[serde(rename = "@Nullable")] -- write deserializer
+    #[serde(default = "r#true")]
+    #[serde(rename = "@Nullable", deserialize_with = "str_to_bool")]
     pub nullable: bool,
+}
+
+fn r#true() -> bool {
+    true
+}
+
+fn str_to_bool<'de, D: Deserializer<'de>>(deserializer: D) -> Result<bool, D::Error> {
+    let bool_string = String::deserialize(deserializer)?;
+    Ok(bool_string.to_lowercase().trim() == "true") // I have a feeling there'll be more...
 }
