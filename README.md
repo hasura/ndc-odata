@@ -1,8 +1,10 @@
 # OData NDC
 
-I had some time over Christmas and decided to learn Rust and the NDC Spec. See
-the `example/` directory for some sample metadata relating to the OData
-reference example, [TripPin](https://services.odata.org/V4/TripPinServiceRW).
+A Native Data Connector (NDC) for OData APIs, specifically for those adhering
+to [OData v4.01](https://docs.oasis-open.org/odata/odata/v4.01/).
+
+See the `example/` directory for sample metadata corresponding to the OData
+reference service: [TripPin](https://services.odata.org/V4/TripPinServiceRW).
 
 Features:
 - [X] Querying at all
