@@ -148,7 +148,8 @@ pub struct Function {
     pub entity_set_path: Option<String>,
 
     #[serde(default)]
-    // #[serde(rename = "@IsBound")]
+    #[serde(rename = "@IsBound")]
+    #[serde(deserialize_with = "str_to_bool")]
     pub is_bound: bool,
 }
 
@@ -174,7 +175,8 @@ pub struct Action {
     pub name: String,
 
     #[serde(default)]
-    // #[serde(rename = "@IsBound")]
+    #[serde(rename = "@IsBound")]
+    #[serde(deserialize_with = "str_to_bool")]
     pub is_bound: bool,
 
     #[serde(default)]
@@ -275,7 +277,8 @@ pub struct TypeDescription {
     pub inner: Type,
 
     #[serde(default = "r#true")]
-    #[serde(rename = "@Nullable", deserialize_with = "str_to_bool")]
+    #[serde(rename = "@Nullable")]
+    #[serde(deserialize_with = "str_to_bool")]
     pub nullable: bool,
 }
 
