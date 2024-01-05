@@ -1,0 +1,18 @@
+services:
+  ndc-odata:
+    build:
+      context: .
+    ports:
+      - 8100:8100
+    volumes:
+      - type: bind
+        source: ${METADATA_PATH:-./example/metadata.json}
+        target: /metadata.json
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl localhost:8100/health
+      start_period: 1s
+      interval: 1s
+      timeout: 10s
+      retries: 20
