@@ -1,3 +1,4 @@
+mod capabilities;
 mod configuration;
 mod health_check;
 mod query;
@@ -64,19 +65,7 @@ impl connector::Connector for OData {
     }
 
     async fn get_capabilities() -> JsonResponse<models::CapabilitiesResponse> {
-        models::CapabilitiesResponse {
-            capabilities: models::Capabilities {
-                query: models::QueryCapabilities {
-                    aggregates: None,
-                    variables: None,
-                },
-
-                explain: None,
-                relationships: None,
-            },
-            versions: "^0.1.0".to_string(),
-        }
-        .into()
+        capabilities::get_capabilities().into()
     }
 
     async fn get_schema(
