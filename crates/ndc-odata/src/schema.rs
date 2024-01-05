@@ -7,11 +7,8 @@ pub fn get_schema(configuration: &ndc::Configuration) -> models::SchemaResponse 
         collections: translate_collections(&configuration.schema.collections),
         object_types: translate_object_types(&configuration.schema.object_types),
         scalar_types: translate_scalar_types(&configuration.schema.scalar_types),
-
-        // TODO: In OData, these are functions and actions - we already parse these in the OData
-        // response, so these shoudn't be too tricky to add in.
-        functions: translate_functions(&configuration.schema.functions),
-        procedures: translate_procedures(&configuration.schema.procedures),
+        functions: Vec::new(),
+        procedures: Vec::new(),
     }
 }
 
@@ -92,54 +89,6 @@ pub fn translate_scalar_types(
     }
 
     translated
-}
-
-pub fn translate_functions(functions: &Vec<ndc::Function>) -> Vec<models::FunctionInfo> {
-    functions
-        .iter()
-        .map(|function| models::FunctionInfo {
-            arguments: function
-                .arguments
-                .iter()
-                .map(|(name, t)| {
-                    (
-                        name.clone(),
-                        models::ArgumentInfo {
-                            description: None,
-                            argument_type: translate_type(t),
-                        },
-                    )
-                })
-                .collect(),
-            name: function.name.clone(),
-            description: None,
-            result_type: translate_type(&function.result_type),
-        })
-        .collect()
-}
-
-pub fn translate_procedures(procedures: &Vec<ndc::Procedure>) -> Vec<models::ProcedureInfo> {
-    procedures
-        .iter()
-        .map(|procedure| models::ProcedureInfo {
-            arguments: procedure
-                .arguments
-                .iter()
-                .map(|(name, t)| {
-                    (
-                        name.clone(),
-                        models::ArgumentInfo {
-                            description: None,
-                            argument_type: translate_type(t),
-                        },
-                    )
-                })
-                .collect(),
-            name: procedure.name.clone(),
-            description: None,
-            result_type: translate_type(&procedure.result_type),
-        })
-        .collect()
 }
 
 // Helpers
