@@ -8,6 +8,8 @@ pub fn prepare_odata_edmx(metadata: odata::EDMX) -> ndc::Schema {
     let mut collections: Vec<ndc::Collection> = Vec::new(); // TODO: don't use a Vec for appends.
     let mut scalar_types: BTreeSet<String> = BTreeSet::new();
     let mut object_types: BTreeMap<String, ndc::ObjectType> = BTreeMap::new();
+    let mut functions: Vec<ndc::Function> = Vec::new();
+    let mut procedures: Vec<ndc::Procedure> = Vec::new();
 
     for schema in &metadata.data_services.schema {
         let mut scalar_type_additions = find_scalar_types(&schema);
@@ -18,13 +20,58 @@ pub fn prepare_odata_edmx(metadata: odata::EDMX) -> ndc::Schema {
 
         let mut collection_additions = find_collections(&schema);
         collections.append(&mut collection_additions);
+
+        let mut function_additions = find_functions(&schema);
+        functions.append(&mut function_additions);
+
+        let mut procedure_additions = find_procedures(&schema);
+        procedures.append(&mut procedure_additions);
     }
 
     ndc::Schema {
         collections,
         object_types,
         scalar_types,
+        functions,
+        procedures,
     }
+}
+
+pub fn find_functions(schema: &odata::Schema) -> Vec<ndc::Function> {
+    schema
+        .functions
+        .iter()
+        .map(|function| ndc::Function {
+            name: function.name.clone(),
+            result_type: type_description_to_type(&function.return_type.r#type),
+            arguments: function
+                .parameters
+                .iter()
+                .map(|p| (p.name.clone(), type_description_to_type(&p.r#type)))
+                .collect(),
+        })
+        .collect()
+}
+
+pub fn find_procedures(schema: &odata::Schema) -> Vec<ndc::Procedure> {
+    schema
+        .actions
+        .iter()
+        .filter_map(|action| {
+            action
+                .return_type
+                .clone()
+                .map(|return_type| ndc::Procedure {
+                    name: action.name.clone(),
+                    result_type: type_description_to_type(&return_type.r#type),
+                    arguments: action
+                        .parameters
+                        .iter()
+                        .map(|p| (p.name.clone(), type_description_to_type(&p.r#type)))
+                        .collect(),
+                })
+        })
+        .collect()
 }
 
 /// OData's notion of entity sets maps pretty neatly onto the NDC notion of collections, so for

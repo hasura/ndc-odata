@@ -329,6 +329,128 @@
           "name": "Edm.Int"
         }
       }
-    }
+    },
+    "functions": [
+      {
+        "name": "GetPersonWithMostFriends",
+        "arguments": {},
+        "result_type": {
+          "type": "Nullable",
+          "underlying_type": {
+            "type": "Named",
+            "name": "Trippin.Person"
+          }
+        }
+      },
+      {
+        "name": "GetNearestAirport",
+        "arguments": {
+          "lat": {
+            "type": "Named",
+            "name": "Edm.Double"
+          },
+          "lon": {
+            "type": "Named",
+            "name": "Edm.Double"
+          }
+        },
+        "result_type": {
+          "type": "Nullable",
+          "underlying_type": {
+            "type": "Named",
+            "name": "Trippin.Airport"
+          }
+        }
+      },
+      {
+        "name": "GetFavoriteAirline",
+        "arguments": {
+          "person": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Trippin.Person"
+            }
+          }
+        },
+        "result_type": {
+          "type": "Nullable",
+          "underlying_type": {
+            "type": "Named",
+            "name": "Trippin.Airline"
+          }
+        }
+      },
+      {
+        "name": "GetFriendsTrips",
+        "arguments": {
+          "person": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Trippin.Person"
+            }
+          },
+          "userName": {
+            "type": "Named",
+            "name": "Edm.String"
+          }
+        },
+        "result_type": {
+          "type": "Nullable",
+          "underlying_type": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Named",
+              "name": "Trippin.Trip"
+            }
+          }
+        }
+      },
+      {
+        "name": "GetInvolvedPeople",
+        "arguments": {
+          "trip": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Trippin.Trip"
+            }
+          }
+        },
+        "result_type": {
+          "type": "Nullable",
+          "underlying_type": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Named",
+              "name": "Trippin.Person"
+            }
+          }
+        }
+      }
+    ],
+    "procedures": [
+      {
+        "name": "UpdateLastName",
+        "arguments": {
+          "lastName": {
+            "type": "Named",
+            "name": "Edm.String"
+          },
+          "person": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Trippin.Person"
+            }
+          }
+        },
+        "result_type": {
+          "type": "Named",
+          "name": "Edm.Boolean"
+        }
+      }
+    ]
   }
 }

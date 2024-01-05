@@ -35,6 +35,10 @@ pub struct Schema {
     pub scalar_types: BTreeSet<String>,
     #[serde(default)]
     pub object_types: BTreeMap<String, ObjectType>,
+    #[serde(default)]
+    pub functions: Vec<Function>,
+    #[serde(default)]
+    pub procedures: Vec<Procedure>,
 }
 
 impl Default for Schema {
@@ -43,6 +47,8 @@ impl Default for Schema {
             collections: Default::default(),
             object_types: Default::default(),
             scalar_types: Default::default(),
+            functions: Default::default(),
+            procedures: Default::default(),
         }
     }
 }
@@ -58,6 +64,20 @@ pub struct Collection {
 pub struct ObjectType {
     #[serde(flatten)]
     pub fields: BTreeMap<String, Type>,
+}
+
+#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+pub struct Function {
+    pub name: String,
+    pub arguments: BTreeMap<String, Type>,
+    pub result_type: Type,
+}
+
+#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+pub struct Procedure {
+    pub name: String,
+    pub arguments: BTreeMap<String, Type>,
+    pub result_type: Type,
 }
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]

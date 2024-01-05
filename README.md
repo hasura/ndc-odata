@@ -26,7 +26,6 @@ from the [`ndc-spec` list](https://hasura.github.io/ndc-spec).
 - [ ] Metrics
 - [ ] Telemetry
 - [X] Capabilities
-- [ ] Types
 - [X] Schema
     - [X] Scalar Types
     - [X] Object Types
