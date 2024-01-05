@@ -47,7 +47,6 @@ impl Default for Schema {
             collections: Default::default(),
             object_types: Default::default(),
             scalar_types: Default::default(),
-
             functions: Default::default(),
             procedures: Default::default(),
         }

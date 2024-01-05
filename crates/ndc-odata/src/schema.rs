@@ -10,14 +10,14 @@ pub fn get_schema(configuration: &ndc::Configuration) -> models::SchemaResponse 
 
         // TODO: In OData, these are functions and actions - we already parse these in the OData
         // response, so these shoudn't be too tricky to add in.
-        functions: Vec::new(),
-        procedures: Vec::new(),
+        functions: translate_functions(&configuration.schema.functions),
+        procedures: translate_procedures(&configuration.schema.procedures),
     }
 }
 
 /// Translate an `ndc-odata` collection into an `ndc-spec` collection.
 pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionInfo> {
-    let transform = |collection: &ndc::Collection| {
+    collections.iter().map(|collection: &ndc::Collection| {
         let mut uniqueness_constraints = BTreeMap::new();
 
         if let Some(field) = &collection.key {
@@ -39,9 +39,7 @@ pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::
             foreign_keys: BTreeMap::new(),
             uniqueness_constraints,
         }
-    };
-
-    collections.iter().map(transform).collect()
+    }).collect()
 }
 
 /// Translate an `ndc-odata` object type into an `ndc-spec` collection.
@@ -94,6 +92,54 @@ pub fn translate_scalar_types(
     }
 
     translated
+}
+
+pub fn translate_functions(functions: &Vec<ndc::Function>) -> Vec<models::FunctionInfo> {
+    functions
+        .iter()
+        .map(|function| models::FunctionInfo {
+            arguments: function
+                .arguments
+                .iter()
+                .map(|(name, t)| {
+                    (
+                        name.clone(),
+                        models::ArgumentInfo {
+                            description: None,
+                            argument_type: translate_type(t),
+                        },
+                    )
+                })
+                .collect(),
+            name: function.name.clone(),
+            description: None,
+            result_type: translate_type(&function.result_type),
+        })
+        .collect()
+}
+
+pub fn translate_procedures(procedures: &Vec<ndc::Procedure>) -> Vec<models::ProcedureInfo> {
+    procedures
+        .iter()
+        .map(|procedure| models::ProcedureInfo {
+            arguments: procedure
+                .arguments
+                .iter()
+                .map(|(name, t)| {
+                    (
+                        name.clone(),
+                        models::ArgumentInfo {
+                            description: None,
+                            argument_type: translate_type(t),
+                        },
+                    )
+                })
+                .collect(),
+            name: procedure.name.clone(),
+            description: None,
+            result_type: translate_type(&procedure.result_type),
+        })
+        .collect()
 }
 
 // Helpers
