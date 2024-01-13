@@ -1,57 +1,66 @@
 use itertools::Itertools;
-use ndc_sdk::models;
+use metadata::ndc;
+use std::collections::BTreeSet;
 use url_builder::URLBuilder;
 
-pub fn request_to_url(builder: &mut URLBuilder, request: &models::QueryRequest) {
-    builder.add_route(&request.collection);
+/// The structure of an OData request that we can convert into a URL.
+/// @TODO: deal with $expand subfields.
+pub struct Request {
+    pub endpoint: ndc::Endpoint,
+    pub collection: String,
+    pub fields: Option<BTreeSet<String>>,
+    pub order_by: Option<Vec<(String, Direction)>>,
 
-    if let Some(fields) = &request.query.fields {
-        builder.add_param(
-            "$select",
-            &fields
-                .values()
-                .filter_map(|field| match field {
-                    models::Field::Column { column } => Some(column),
-                    models::Field::Relationship {
-                        query: _,
-                        relationship: _,
-                        arguments: _,
-                    } => None,
-                })
-                .join(", "),
-        );
-    }
-
-    if let Some(limit) = request.query.limit {
-        builder.add_param("$top", &limit.to_string());
-    }
-
-    if let Some(offset) = request.query.offset {
-        builder.add_param("$skip", &offset.to_string());
-    }
-
-    if let Some(models::OrderBy { elements }) = &request.query.order_by {
-        let mut components = elements.iter().filter_map(order_element_to_param);
-        builder.add_param("$orderby", &components.join(", "));
-    }
+    pub limit: Option<u32>,
+    pub offset: Option<u32>,
 }
 
-fn order_element_to_param(element: &models::OrderByElement) -> Option<String> {
-    match &element.target {
-        models::OrderByTarget::Column { name, path: _ } => format!(
-            "{} {}",
-            name,
-            match element.order_direction {
-                models::OrderDirection::Asc => "asc",
-                models::OrderDirection::Desc => "desc",
-            }
-        )
-        .into(),
-        models::OrderByTarget::StarCountAggregate { path: _ } => None,
-        models::OrderByTarget::SingleColumnAggregate {
-            column: _,
-            function: _,
-            path: _,
-        } => None,
+pub enum Direction {
+    Ascending,
+    Descending,
+}
+
+impl Request {
+    /// Convert a structured `Request` into an OData URL. This should be used by both the
+    /// `/explain` endpoint and the `/query` endpoint.
+    pub fn to_url(&self) -> String {
+        let mut builder = URLBuilder::new();
+
+        builder
+            .set_protocol(&self.endpoint.protocol)
+            .set_host(&self.endpoint.authority)
+            .add_route(&self.endpoint.path)
+            .add_route(&self.collection);
+
+        if let Some(fields) = &self.fields {
+            builder.add_param("$select", &fields.iter().join(", "));
+        }
+
+        if let Some(elements) = &self.order_by {
+            builder.add_param(
+                "$orderby",
+                &elements
+                    .iter()
+                    .map(|(name, direction)| {
+                        let direction_ = match direction {
+                            Direction::Ascending => "asc",
+                            Direction::Descending => "desc",
+                        };
+
+                        format!("{name} {direction_}")
+                    })
+                    .join(", "),
+            );
+        }
+
+        if let Some(limit) = self.limit {
+            builder.add_param("$top", &limit.to_string());
+        }
+
+        if let Some(offset) = self.offset {
+            builder.add_param("$skip", &offset.to_string());
+        }
+
+        builder.build()
     }
 }

@@ -1,111 +1,21 @@
+//! The `ndc-spec` schema for this OData endpoint.
+
+pub mod collections;
+pub mod functions;
+pub mod object_types;
+pub mod procedures;
+pub mod types;
+
 use metadata::ndc;
 use ndc_sdk::models;
-use std::collections::{BTreeMap, BTreeSet};
 
+/// Translate the internal `ndc-odata` configuration into an `ndc-spec` schema.
 pub fn get_schema(configuration: &ndc::Configuration) -> models::SchemaResponse {
     models::SchemaResponse {
-        collections: translate_collections(&configuration.schema.collections),
-        object_types: translate_object_types(&configuration.schema.object_types),
-        scalar_types: translate_scalar_types(&configuration.schema.scalar_types),
-        functions: Vec::new(),
-        procedures: Vec::new(),
-    }
-}
-
-/// Translate an `ndc-odata` collection into an `ndc-spec` collection.
-pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionInfo> {
-    collections.iter().map(|collection: &ndc::Collection| {
-        let mut uniqueness_constraints = BTreeMap::new();
-
-        if let Some(field) = &collection.key {
-            let relationship = format!("{}_by_{}", &collection.name, &field);
-
-            uniqueness_constraints.insert(
-                relationship,
-                models::UniquenessConstraint {
-                    unique_columns: Vec::from([field.clone()]),
-                },
-            );
-        }
-
-        models::CollectionInfo {
-            name: collection.name.clone(),
-            collection_type: collection.collection_type.clone(),
-            description: None,
-            arguments: BTreeMap::new(),
-            foreign_keys: BTreeMap::new(),
-            uniqueness_constraints,
-        }
-    }).collect()
-}
-
-/// Translate an `ndc-odata` object type into an `ndc-spec` collection.
-/// TODO: This seems messy; maybe I should learn more about iterators?
-pub fn translate_object_types(
-    object_types: &BTreeMap<String, ndc::ObjectType>,
-) -> BTreeMap<String, models::ObjectType> {
-    let mut translated = BTreeMap::new();
-
-    for (name, object_type) in object_types {
-        let mut fields = BTreeMap::new();
-
-        for (key, r#type) in &object_type.fields {
-            fields.insert(
-                key.clone(),
-                models::ObjectField {
-                    description: None,
-                    r#type: translate_type(r#type),
-                },
-            );
-        }
-
-        translated.insert(
-            name.clone(),
-            models::ObjectType {
-                description: None,
-                fields,
-            },
-        );
-    }
-
-    translated
-}
-
-/// Translate an `ndc-odata` scalar type (currently just a `String`) into an `ndc-spec` scalar
-/// type.
-pub fn translate_scalar_types(
-    scalar_types: &BTreeSet<String>,
-) -> BTreeMap<String, models::ScalarType> {
-    let mut translated = BTreeMap::new();
-
-    for name in scalar_types {
-        translated.insert(
-            name.clone(),
-            models::ScalarType {
-                aggregate_functions: BTreeMap::new(),
-                comparison_operators: BTreeMap::new(),
-            },
-        );
-    }
-
-    translated
-}
-
-// Helpers
-
-/// Translate an `ndc-odata` type into an `ndc-spec` type. They're basically identical.
-fn translate_type(r#type: &ndc::Type) -> models::Type {
-    match r#type {
-        ndc::Type::Named { name } => models::Type::Named {
-            name: name.to_string(),
-        },
-
-        ndc::Type::Nullable { underlying_type } => models::Type::Nullable {
-            underlying_type: Box::new(translate_type(&*underlying_type)),
-        },
-
-        ndc::Type::Collection { element_type } => models::Type::Array {
-            element_type: Box::new(translate_type(&*element_type)),
-        },
+        collections: collections::translate(&configuration.schema.collections),
+        object_types: object_types::translate(&configuration.schema.object_types),
+        scalar_types: types::scalar_types(&configuration.schema.scalar_types),
+        functions: functions::translate(&configuration.schema.functions),
+        procedures: procedures::translate(&configuration.schema.procedures),
     }
 }

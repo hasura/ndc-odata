@@ -1,12 +1,12 @@
 mod capabilities;
 mod configuration;
+mod explain;
 mod health_check;
 mod query;
 mod schema;
 
 use ndc_sdk::json_response::JsonResponse;
 use ndc_sdk::{connector, models};
-use std::collections::BTreeMap;
 
 #[derive(Clone, Default)]
 pub struct OData {}
@@ -24,23 +24,13 @@ impl connector::Connector for OData {
     async fn update_configuration(
         configuration: Self::RawConfiguration,
     ) -> Result<Self::RawConfiguration, connector::UpdateConfigurationError> {
-        Ok(metadata::ndc::RawConfiguration {
-            api_endpoint: configuration.api_endpoint.clone(),
-            schema: configuration::fetch_metadata(&configuration.api_endpoint).await?,
-        })
+        configuration::update_configuration(configuration).await
     }
 
     async fn validate_raw_configuration(
         configuration: Self::RawConfiguration,
     ) -> Result<Self::Configuration, connector::ValidateError> {
-        match metadata::ndc::url::Endpoint::parse(&configuration.api_endpoint) {
-            Ok(uri) => Ok(metadata::ndc::Configuration {
-                api_endpoint: uri,
-                schema: configuration.schema,
-            }),
-
-            Err(_err) => todo!(), // connector::ValidateError::ValidateError(())
-        }
+        configuration::validate_raw_configuration(configuration).await
     }
 
     async fn try_init_state(
@@ -61,7 +51,7 @@ impl connector::Connector for OData {
         configuration: &Self::Configuration,
         _state: &Self::State,
     ) -> Result<(), connector::HealthError> {
-        health_check::health_check(&configuration.api_endpoint.to_string()).await
+        health_check::health_check(&configuration.api_endpoint).await
     }
 
     async fn get_capabilities() -> JsonResponse<models::CapabilitiesResponse> {
@@ -75,16 +65,11 @@ impl connector::Connector for OData {
     }
 
     async fn explain(
-        _configuration: &Self::Configuration,
+        configuration: &Self::Configuration,
         _state: &Self::State,
-        _query: models::QueryRequest,
+        query: models::QueryRequest,
     ) -> Result<JsonResponse<models::ExplainResponse>, connector::ExplainError> {
-        // TODO: probably the only useful thing we could do here is list the requests we're going
-        // to have to make to the OData API?
-        Ok(models::ExplainResponse {
-            details: BTreeMap::new(),
-        }
-        .into())
+        Ok(explain::get_details(configuration, query)?.into())
     }
 
     async fn mutation(

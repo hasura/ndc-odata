@@ -12,8 +12,12 @@ pub fn get_capabilities() -> models::CapabilitiesResponse {
                 variables: None,
             },
 
-            explain: None,
-            relationships: None,
-        }
+            explain: Some(models::LeafCapability {}),
+
+            relationships: Some(models::RelationshipCapabilities {
+                order_by_aggregate: None,
+                relation_comparisons: None,
+            }),
+        },
     }
 }
