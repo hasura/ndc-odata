@@ -35,314 +35,378 @@
     ],
     "object_types": {
       "Trippin.Airline": {
-        "AirlineCode": {
-          "type": "Nullable",
-          "underlying_type": {
-            "type": "Named",
-            "name": "Edm.String"
-          }
-        },
-        "Name": {
-          "type": "Named",
-          "name": "Edm.String"
-        }
-      },
-      "Trippin.Airport": {
-        "IataCode": {
-          "type": "Named",
-          "name": "Edm.String"
-        },
-        "IcaoCode": {
-          "type": "Nullable",
-          "underlying_type": {
-            "type": "Named",
-            "name": "Edm.String"
-          }
-        },
-        "Location": {
-          "type": "Named",
-          "name": "Trippin.AirportLocation"
-        },
-        "Name": {
-          "type": "Named",
-          "name": "Edm.String"
-        }
-      },
-      "Trippin.Employee": {
-        "Cost": {
-          "type": "Nullable",
-          "underlying_type": {
-            "type": "Named",
-            "name": "Edm.Int"
-          }
-        },
-        "Peers": {
-          "type": "Collection",
-          "element_type": {
-            "type": "Nullable",
-            "underlying_type": {
-              "type": "Named",
-              "name": "Trippin.Person"
-            }
-          }
-        }
-      },
-      "Trippin.Event": {
-        "Description": {
-          "type": "Named",
-          "name": "Edm.String"
-        },
-        "OccursAt": {
-          "type": "Named",
-          "name": "Trippin.EventLocation"
-        }
-      },
-      "Trippin.Flight": {
-        "Airline": {
-          "type": "Named",
-          "name": "Trippin.Airline"
-        },
-        "FlightNumber": {
-          "type": "Named",
-          "name": "Edm.String"
-        },
-        "From": {
-          "type": "Named",
-          "name": "Trippin.Airport"
-        },
-        "To": {
-          "type": "Named",
-          "name": "Trippin.Airport"
-        }
-      },
-      "Trippin.Manager": {
-        "BossOffice": {
-          "type": "Named",
-          "name": "Trippin.Location"
-        },
-        "Budget": {
-          "type": "Nullable",
-          "underlying_type": {
-            "type": "Named",
-            "name": "Edm.Int"
-          }
-        },
-        "DirectReports": {
-          "type": "Collection",
-          "element_type": {
-            "type": "Nullable",
-            "underlying_type": {
-              "type": "Named",
-              "name": "Trippin.Person"
-            }
-          }
-        }
-      },
-      "Trippin.Person": {
-        "AddressInfo": {
-          "type": "Collection",
-          "element_type": {
-            "type": "Nullable",
-            "underlying_type": {
-              "type": "Named",
-              "name": "Trippin.Location"
-            }
-          }
-        },
-        "Age": {
-          "type": "Named",
-          "name": "Edm.Int"
-        },
-        "BestFriend": {
-          "type": "Named",
-          "name": "Trippin.Person"
-        },
-        "Emails": {
-          "type": "Collection",
-          "element_type": {
+        "fields": {
+          "AirlineCode": {
             "type": "Nullable",
             "underlying_type": {
               "type": "Named",
               "name": "Edm.String"
             }
-          }
-        },
-        "FavoriteFeature": {
-          "type": "Nullable",
-          "underlying_type": {
+          },
+          "Name": {
             "type": "Named",
-            "name": "Trippin.Feature"
+            "name": "Edm.String"
           }
-        },
-        "Features": {
-          "type": "Nullable",
-          "underlying_type": {
+        }
+      },
+      "Trippin.Airport": {
+        "fields": {
+          "IataCode": {
+            "type": "Named",
+            "name": "Edm.String"
+          },
+          "IcaoCode": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
+            }
+          },
+          "Location": {
+            "type": "Named",
+            "name": "Trippin.AirportLocation"
+          },
+          "Name": {
+            "type": "Named",
+            "name": "Edm.String"
+          }
+        }
+      },
+      "Trippin.AirportLocation": {
+        "fields": {
+          "Loc": {
+            "type": "Named",
+            "name": "Edm.GeographyPoint"
+          }
+        }
+      },
+      "Trippin.City": {
+        "fields": {
+          "CountryRegion": {
+            "type": "Named",
+            "name": "Edm.String"
+          },
+          "Name": {
+            "type": "Named",
+            "name": "Edm.String"
+          },
+          "Region": {
+            "type": "Named",
+            "name": "Edm.String"
+          }
+        }
+      },
+      "Trippin.Employee": {
+        "fields": {
+          "Cost": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Int"
+            }
+          },
+          "Peers": {
             "type": "Collection",
             "element_type": {
               "type": "Nullable",
               "underlying_type": {
                 "type": "Named",
-                "name": "Trippin.Feature"
+                "name": "Trippin.Person"
               }
             }
           }
-        },
-        "FirstName": {
-          "type": "Nullable",
-          "underlying_type": {
+        }
+      },
+      "Trippin.Event": {
+        "fields": {
+          "Description": {
             "type": "Named",
             "name": "Edm.String"
-          }
-        },
-        "Friends": {
-          "type": "Collection",
-          "element_type": {
-            "type": "Nullable",
-            "underlying_type": {
-              "type": "Named",
-              "name": "Trippin.Person"
-            }
-          }
-        },
-        "Gender": {
-          "type": "Nullable",
-          "underlying_type": {
+          },
+          "OccursAt": {
             "type": "Named",
-            "name": "Trippin.PersonGender"
+            "name": "Trippin.EventLocation"
           }
-        },
-        "HomeAddress": {
-          "type": "Named",
-          "name": "Trippin.Location"
-        },
-        "LastName": {
-          "type": "Named",
-          "name": "Edm.String"
-        },
-        "MiddleName": {
-          "type": "Named",
-          "name": "Edm.String"
-        },
-        "Trips": {
-          "type": "Collection",
-          "element_type": {
-            "type": "Nullable",
-            "underlying_type": {
-              "type": "Named",
-              "name": "Trippin.Trip"
-            }
-          }
-        },
-        "UserName": {
-          "type": "Nullable",
-          "underlying_type": {
+        }
+      },
+      "Trippin.EventLocation": {
+        "fields": {
+          "BuildingInfo": {
             "type": "Named",
             "name": "Edm.String"
           }
         }
       },
-      "Trippin.PlanItem": {
-        "ConfirmationCode": {
-          "type": "Named",
-          "name": "Edm.String"
-        },
-        "Duration": {
-          "type": "Nullable",
-          "underlying_type": {
+      "Trippin.Flight": {
+        "fields": {
+          "Airline": {
             "type": "Named",
-            "name": "Edm.Duration"
-          }
-        },
-        "EndsAt": {
-          "type": "Nullable",
-          "underlying_type": {
+            "name": "Trippin.Airline"
+          },
+          "FlightNumber": {
             "type": "Named",
-            "name": "Edm.DateTimeOffset"
+            "name": "Edm.String"
+          },
+          "From": {
+            "type": "Named",
+            "name": "Trippin.Airport"
+          },
+          "To": {
+            "type": "Named",
+            "name": "Trippin.Airport"
           }
-        },
-        "PlanItemId": {
-          "type": "Nullable",
-          "underlying_type": {
+        }
+      },
+      "Trippin.Location": {
+        "fields": {
+          "Address": {
+            "type": "Named",
+            "name": "Edm.String"
+          },
+          "City": {
+            "type": "Named",
+            "name": "Trippin.City"
+          }
+        }
+      },
+      "Trippin.Manager": {
+        "fields": {
+          "BossOffice": {
+            "type": "Named",
+            "name": "Trippin.Location"
+          },
+          "Budget": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Int"
+            }
+          },
+          "DirectReports": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Nullable",
+              "underlying_type": {
+                "type": "Named",
+                "name": "Trippin.Person"
+              }
+            }
+          }
+        }
+      },
+      "Trippin.Person": {
+        "fields": {
+          "AddressInfo": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Nullable",
+              "underlying_type": {
+                "type": "Named",
+                "name": "Trippin.Location"
+              }
+            }
+          },
+          "Age": {
             "type": "Named",
             "name": "Edm.Int"
-          }
-        },
-        "StartsAt": {
-          "type": "Nullable",
-          "underlying_type": {
+          },
+          "BestFriend": {
             "type": "Named",
-            "name": "Edm.DateTimeOffset"
-          }
-        }
-      },
-      "Trippin.PublicTransportation": {
-        "SeatNumber": {
-          "type": "Named",
-          "name": "Edm.String"
-        }
-      },
-      "Trippin.Trip": {
-        "Budget": {
-          "type": "Nullable",
-          "underlying_type": {
-            "type": "Named",
-            "name": "Edm.Single"
-          }
-        },
-        "Description": {
-          "type": "Named",
-          "name": "Edm.String"
-        },
-        "EndsAt": {
-          "type": "Nullable",
-          "underlying_type": {
-            "type": "Named",
-            "name": "Edm.DateTimeOffset"
-          }
-        },
-        "Name": {
-          "type": "Named",
-          "name": "Edm.String"
-        },
-        "PlanItems": {
-          "type": "Collection",
-          "element_type": {
+            "name": "Trippin.Person"
+          },
+          "Emails": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Nullable",
+              "underlying_type": {
+                "type": "Named",
+                "name": "Edm.String"
+              }
+            }
+          },
+          "FavoriteFeature": {
             "type": "Nullable",
             "underlying_type": {
               "type": "Named",
-              "name": "Trippin.PlanItem"
+              "name": "Trippin.Feature"
             }
-          }
-        },
-        "ShareId": {
-          "type": "Nullable",
-          "underlying_type": {
+          },
+          "Features": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Collection",
+              "element_type": {
+                "type": "Nullable",
+                "underlying_type": {
+                  "type": "Named",
+                  "name": "Trippin.Feature"
+                }
+              }
+            }
+          },
+          "FirstName": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
+            }
+          },
+          "Friends": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Nullable",
+              "underlying_type": {
+                "type": "Named",
+                "name": "Trippin.Person"
+              }
+            }
+          },
+          "Gender": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Trippin.PersonGender"
+            }
+          },
+          "HomeAddress": {
             "type": "Named",
-            "name": "Edm.Guid"
-          }
-        },
-        "StartsAt": {
-          "type": "Nullable",
-          "underlying_type": {
+            "name": "Trippin.Location"
+          },
+          "LastName": {
             "type": "Named",
-            "name": "Edm.DateTimeOffset"
-          }
-        },
-        "Tags": {
-          "type": "Collection",
-          "element_type": {
+            "name": "Edm.String"
+          },
+          "MiddleName": {
+            "type": "Named",
+            "name": "Edm.String"
+          },
+          "Trips": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Nullable",
+              "underlying_type": {
+                "type": "Named",
+                "name": "Trippin.Trip"
+              }
+            }
+          },
+          "UserName": {
             "type": "Nullable",
             "underlying_type": {
               "type": "Named",
               "name": "Edm.String"
             }
           }
-        },
-        "TripId": {
-          "type": "Nullable",
-          "underlying_type": {
+        }
+      },
+      "Trippin.PlanItem": {
+        "fields": {
+          "ConfirmationCode": {
             "type": "Named",
-            "name": "Edm.Int"
+            "name": "Edm.String"
+          },
+          "Duration": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Duration"
+            }
+          },
+          "EndsAt": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.DateTimeOffset"
+            }
+          },
+          "PlanItemId": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Int"
+            }
+          },
+          "StartsAt": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.DateTimeOffset"
+            }
+          }
+        }
+      },
+      "Trippin.PublicTransportation": {
+        "fields": {
+          "SeatNumber": {
+            "type": "Named",
+            "name": "Edm.String"
+          }
+        }
+      },
+      "Trippin.Trip": {
+        "fields": {
+          "Budget": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Single"
+            }
+          },
+          "Description": {
+            "type": "Named",
+            "name": "Edm.String"
+          },
+          "EndsAt": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.DateTimeOffset"
+            }
+          },
+          "Name": {
+            "type": "Named",
+            "name": "Edm.String"
+          },
+          "PlanItems": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Nullable",
+              "underlying_type": {
+                "type": "Named",
+                "name": "Trippin.PlanItem"
+              }
+            }
+          },
+          "ShareId": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Guid"
+            }
+          },
+          "StartsAt": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.DateTimeOffset"
+            }
+          },
+          "Tags": {
+            "type": "Collection",
+            "element_type": {
+              "type": "Nullable",
+              "underlying_type": {
+                "type": "Named",
+                "name": "Edm.String"
+              }
+            }
+          },
+          "TripId": {
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Int"
+            }
           }
         }
       }

@@ -1,0 +1,21 @@
+{
+  "endpoint": "http://localhost:8100/query",
+  "method": "POST",
+  "data": {
+    "collection": "People",
+    "arguments": {},
+    "query": {
+        "fields": {
+            "first_name": {
+                "type": "column",
+                "column": "FirstName"
+            },
+            "last_name": {
+                "type": "column",
+                "column": "LastName"
+            }
+        }
+    },
+    "collection_relationships": {}
+  }
+}

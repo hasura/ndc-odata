@@ -6,8 +6,8 @@ use url_builder::URLBuilder;
 /// The structure of an OData request that we can convert into a URL.
 /// @TODO: deal with $expand subfields.
 pub struct Request {
-    pub endpoint: ndc::Endpoint,
     pub collection: String,
+    pub endpoint: ndc::Endpoint,
     pub fields: Option<BTreeSet<String>>,
     pub order_by: Option<Vec<(String, Direction)>>,
 

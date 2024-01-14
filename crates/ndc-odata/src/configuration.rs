@@ -52,6 +52,6 @@ pub async fn validate_raw_configuration(
             let invalid_range = connector::InvalidRange { path, message };
 
             connector::ValidateError::ValidateError(Vec::from([invalid_range]))
-        })
+        }),
     }
 }

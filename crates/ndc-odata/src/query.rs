@@ -11,11 +11,11 @@ use std::collections::BTreeMap;
 
 /// Translate an `ndc-spec` request into an `OData` request that we can then convert into a URL.
 /// This method is used by both the `/explain` and `/query` endpoints.
-pub fn translate_request(
+pub fn build_url(
     configuration: &ndc::Configuration,
-    request: models::QueryRequest,
+    request: &models::QueryRequest,
 ) -> request::Request {
-    let fields = request.query.fields.map(|fields| {
+    let fields = request.query.fields.clone().map(|fields| {
         fields
             .values()
             .filter_map(|field| match field {
@@ -25,7 +25,7 @@ pub fn translate_request(
             .collect()
     });
 
-    let order_by = request.query.order_by.map(|order_by| {
+    let order_by = request.query.order_by.clone().map(|order_by| {
         order_by
             .elements
             .iter()
@@ -44,7 +44,7 @@ pub fn translate_request(
 
     request::Request {
         endpoint: configuration.api_endpoint.clone(),
-        collection: request.collection,
+        collection: request.collection.clone(),
         fields,
         order_by,
         limit: request.query.limit,
@@ -62,7 +62,7 @@ pub async fn execute_query(
     configuration: &ndc::Configuration,
     request: models::QueryRequest,
 ) -> Result<models::QueryResponse, connector::QueryError> {
-    let url = translate_request(configuration, request).to_url();
+    let url = build_url(configuration, &request).to_url();
 
     let body: Response = reqwest::get(url)
         .await
@@ -73,18 +73,34 @@ pub async fn execute_query(
         .map_err(Box::from)
         .map_err(connector::QueryError::Other)?;
 
-    Ok(models::QueryResponse(Vec::from([models::RowSet {
-        rows: Some(body.value.into_iter().map(prepare_row).collect()),
-        aggregates: None,
-    }])))
-}
+    let mut results = Vec::new();
 
-fn prepare_row(row: BTreeMap<String, Value>) -> IndexMap<String, models::RowFieldValue> {
-    let mut row_field_values = IndexMap::new();
+    for result_row in body.value {
+        let mut row_field_values = IndexMap::new();
 
-    for (field_name, field_value) in row {
-        row_field_values.insert(field_name.clone(), models::RowFieldValue(field_value));
+        for (field_name, field_type) in &request.query.fields.clone().unwrap() {
+            match field_type {
+                models::Field::Column{ column } =>
+                    match result_row.get(column.as_str()) {
+                        Some(value) => {
+                            row_field_values.insert(
+                                field_name.clone(),
+                                models::RowFieldValue(value.clone())
+                            );
+                        }
+                        None => ()
+                    },
+
+                models::Field::Relationship { query: _, relationship: _, arguments: _ } =>
+                    ()
+            }
+        }
+
+        results.push(row_field_values);
     }
 
-    row_field_values
+    Ok(models::QueryResponse(Vec::from([models::RowSet {
+        rows: Some(results),
+        aggregates: None,
+    }])))
 }

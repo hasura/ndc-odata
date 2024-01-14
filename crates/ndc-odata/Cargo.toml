@@ -7,17 +7,17 @@ license.workspace = true
 
 [dependencies]
 async-trait = "0.1.75"
-backtrace-on-stack-overflow = "0.3.0"
+cargo-insta = "1.34.0"
 indexmap = "2.1.0"
+insta = "1.34.0"
 itertools = "0.12.0"
 metadata = { path = "../metadata" }
 ndc-sdk = { git = "https://github.com/hasura/ndc-hub.git", rev = "7ac41c2" }
 prometheus = "0.13.3"
 quick-xml = { version = "0.31.0", features = [ "overlapped-lists", "serialize" ] }
-quickxml_to_serde = "0.5.0"
 reqwest = "0.11.23"
 serde = "1.0.193"
 serde_json = "1.0.108"
-serde_path_to_error = "0.1.15"
+test-each = "0.2.1"
 tokio = "1.35.1"
 url-builder = "0.1.1"

@@ -4,50 +4,46 @@ use std::collections::BTreeMap;
 
 /// Translate our internal understanding of models into the `ndc-spec` format.
 pub fn translate(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionInfo> {
-    collections
-        .iter()
-        .map(|collection| {
-            let mut foreign_keys = BTreeMap::new();
+    let mut results = Vec::new();
 
-            for (target, foreign_collection) in &collection.relationships {
-                foreign_keys.insert(
-                    target.clone(),
-                    models::ForeignKeyConstraint {
-                        column_mapping: BTreeMap::from([(
-                            target.clone(),
-                            collections
-                                .iter()
-                                .find(|c| &c.name == foreign_collection)
-                                .unwrap()
-                                .key
-                                .clone(),
-                        )]),
-                        foreign_collection: foreign_collection.clone(),
-                    },
-                );
-            }
+    for collection in collections {
+        let mut foreign_keys = BTreeMap::new();
 
-            models::CollectionInfo {
-                name: collection.name.clone(),
-                collection_type: collection.collection_type.clone(),
-                description: None,
-                arguments: BTreeMap::new(),
-                foreign_keys,
-                uniqueness_constraints: uniqueness_constraints(&collection),
-            }
-        })
-        .collect()
-}
+        for (relationship_target, foreign_collection) in &collection.relationships {
+            let target_key = collections
+                .iter()
+                .find(|collection| &collection.name == foreign_collection)
+                .map(|collection| collection.key.clone())
+                .unwrap();
 
-/// For now, the only uniqueness constraints we can glean are those given by the `Key` property in
-/// the OData metadata.
-fn uniqueness_constraints(
-    collection: &ndc::Collection,
-) -> BTreeMap<String, models::UniquenessConstraint> {
-    BTreeMap::from([(
-        format!("{}By{}", collection.name, collection.key),
-        models::UniquenessConstraint {
+            let column_mapping = BTreeMap::from([(relationship_target.clone(), target_key)]);
+
+            foreign_keys.insert(
+                relationship_target.clone(),
+                models::ForeignKeyConstraint {
+                    column_mapping,
+                    foreign_collection: foreign_collection.clone(),
+                },
+            );
+        }
+
+        let primary_key_constraint = format!("{}By{}", collection.name, collection.key.clone());
+        let uniqueness_constraint = models::UniquenessConstraint {
             unique_columns: vec![collection.key.clone()],
-        },
-    )])
+        };
+
+        results.push(models::CollectionInfo {
+            name: collection.name.clone(),
+            collection_type: collection.collection_type.clone(),
+            foreign_keys,
+            description: None,
+            arguments: BTreeMap::new(),
+            uniqueness_constraints: BTreeMap::from([(
+                primary_key_constraint,
+                uniqueness_constraint,
+            )]),
+        });
+    }
+
+    results
 }

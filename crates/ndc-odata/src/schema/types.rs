@@ -1,23 +1,6 @@
-use metadata::ndc::ScalarType;
 use metadata::ndc;
 use ndc_sdk::models;
-use std::collections::{BTreeMap, BTreeSet};
-
-pub fn scalar_types(scalar_types: &BTreeSet<ScalarType>) -> BTreeMap<String, models::ScalarType> {
-    let mut results = BTreeMap::new();
-
-    for ScalarType(scalar_type) in scalar_types {
-        results.insert(
-            scalar_type.clone(),
-            models::ScalarType {
-                aggregate_functions: BTreeMap::new(),
-                comparison_operators: BTreeMap::new(),
-            },
-        );
-    }
-
-    results
-}
+use std::collections::BTreeMap;
 
 /// Translate an `ndc-odata` type into an `ndc-spec` type. They're structured identically.
 pub fn translate_type(r#type: &ndc::Type) -> models::Type {

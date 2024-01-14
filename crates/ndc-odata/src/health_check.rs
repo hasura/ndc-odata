@@ -14,10 +14,8 @@ pub async fn health_check(
         .map_err(connector::HealthError::Other)?
         .status();
 
-    if status.is_success() {
-        Ok(())
-    } else {
+    status.is_success().then_some(()).ok_or({
         let explanation = status.canonical_reason().unwrap_or(status.as_str());
-        Err(connector::HealthError::Other(Box::from(explanation)))
-    }
+        connector::HealthError::Other(Box::from(explanation))
+    })
 }

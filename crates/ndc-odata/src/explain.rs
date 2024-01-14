@@ -9,7 +9,8 @@ pub fn get_details(
     configuration: &ndc::Configuration,
     query: models::QueryRequest,
 ) -> Result<models::ExplainResponse, connector::ExplainError> {
-    let request_url = super::query::translate_request(configuration, query).to_url();
+    let request_url = super::query::build_url(configuration, &query).to_url();
+
     Ok(models::ExplainResponse {
         details: BTreeMap::from([("query".to_string(), request_url)]),
     })
