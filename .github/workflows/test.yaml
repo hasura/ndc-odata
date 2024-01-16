@@ -19,4 +19,10 @@ jobs:
         with:
           toolchain: stable
 
+      - run: cargo build --all
+
+      - run: |
+          just start &
+          sleep 5 # This can't be best practice
+
       - run: just test
