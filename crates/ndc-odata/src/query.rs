@@ -4,32 +4,27 @@ pub mod fields;
 pub mod order_by;
 pub mod query;
 pub mod request;
+pub mod response;
 
 pub use fields::*;
 pub use order_by::*;
 pub use query::*;
 pub use request::*;
+pub use response::*;
 
 use indexmap::IndexMap;
 use metadata::ndc;
 use ndc_sdk::{connector, models};
-use serde::Deserialize;
-use serde_json::Value;
-use std::collections::BTreeMap;
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct Response {
-    #[serde(default)]
-    pub value: Vec<BTreeMap<String, Value>>,
-}
 
 pub async fn execute_query(
     configuration: &ndc::Configuration,
     request: models::QueryRequest,
 ) -> Result<models::QueryResponse, connector::QueryError> {
-    let request_url = super::query::Request::from_user_request(configuration, &request)
+    let request_structure = Request::from_user_request(configuration, &request)
         .map_err(Box::from)
-        .map_err(connector::QueryError::Other)?
+        .map_err(connector::QueryError::Other)?;
+
+    let request_url = request_structure
         .to_url()
         .map_err(Box::from)
         .map_err(connector::QueryError::Other)?;
@@ -43,40 +38,22 @@ pub async fn execute_query(
         .map_err(Box::from)
         .map_err(connector::QueryError::Other)?;
 
-    let mut results = Vec::new();
+    let mut rows = Vec::new();
 
-    for result_row in body.value {
-        let mut row_field_values = IndexMap::new();
+    for result_row in &body.value {
+        let mut row = IndexMap::new();
 
-        for (field_name, field_type) in &request.query.fields.clone().unwrap() {
-            match field_type {
-                models::Field::Column { column } => match result_row.get(column.as_str()) {
-                    Some(value) => {
-                        row_field_values
-                            .insert(field_name.clone(), models::RowFieldValue(value.clone()));
-                    }
-                    None => (),
-                },
-
-                models::Field::Relationship {
-                    query: _,
-                    relationship,
-                    arguments: _,
-                } => match result_row.get(relationship.as_str()) {
-                    Some(object) => {
-                        row_field_values
-                            .insert(field_name.clone(), models::RowFieldValue(object.clone()));
-                    }
-                    None => (),
-                },
-            }
+        for (field, value) in Response::interpret(result_row, &request_structure.query) {
+            row.insert(field.clone(), models::RowFieldValue(value));
         }
 
-        results.push(row_field_values);
+        rows.push(row);
     }
 
-    Ok(models::QueryResponse(Vec::from([models::RowSet {
-        rows: Some(results),
+    let row_set = models::RowSet {
+        rows: Some(rows),
         aggregates: None,
-    }])))
+    };
+
+    Ok(models::QueryResponse(Vec::from([row_set])))
 }

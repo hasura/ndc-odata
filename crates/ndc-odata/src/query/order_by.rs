@@ -1,7 +1,9 @@
 use ndc_sdk::models;
 
+#[derive(Eq, Ord, PartialEq, PartialOrd)]
 pub struct OrderBy(pub Vec<OrderByElement>);
 
+#[derive(Eq, Ord, PartialEq, PartialOrd)]
 pub struct OrderByElement {
     pub order_direction: models::OrderDirection,
     pub target: String,
