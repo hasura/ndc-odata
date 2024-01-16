@@ -7,4 +7,6 @@ package.license = "Apache-2.0"
 
 members = [
   "crates/ndc-odata",
+  "crates/metadata",
+  "crates/map-iterators",
 ]

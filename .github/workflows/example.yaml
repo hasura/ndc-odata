@@ -27,6 +27,6 @@ jobs:
         with:
           time: '5' # seconds
 
-      - run: just update-example-metadata
+      - run: just update
 
       - run: git diff

@@ -7,9 +7,6 @@ pub fn get_schema(configuration: &ndc::Configuration) -> models::SchemaResponse 
         collections: translate_collections(&configuration.schema.collections),
         object_types: translate_object_types(&configuration.schema.object_types),
         scalar_types: translate_scalar_types(&configuration.schema.scalar_types),
-
-        // TODO: In OData, these are functions and actions - we already parse these in the OData
-        // response, so these shoudn't be too tricky to add in.
         functions: Vec::new(),
         procedures: Vec::new(),
     }
@@ -17,7 +14,7 @@ pub fn get_schema(configuration: &ndc::Configuration) -> models::SchemaResponse 
 
 /// Translate an `ndc-odata` collection into an `ndc-spec` collection.
 pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionInfo> {
-    let transform = |collection: &ndc::Collection| {
+    collections.iter().map(|collection: &ndc::Collection| {
         let mut uniqueness_constraints = BTreeMap::new();
 
         if let Some(field) = &collection.key {
@@ -39,9 +36,7 @@ pub fn translate_collections(collections: &Vec<ndc::Collection>) -> Vec<models::
             foreign_keys: BTreeMap::new(),
             uniqueness_constraints,
         }
-    };
-
-    collections.iter().map(transform).collect()
+    }).collect()
 }
 
 /// Translate an `ndc-odata` object type into an `ndc-spec` collection.
