@@ -20,3 +20,29 @@ jobs:
           toolchain: stable
 
       - run: just test
+
+  ndc-test:
+    name: ndc test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - uses: actions/checkout@v4
+        with:
+          path: main
+
+      - run: cargo build
+        working-directory: main
+
+      - run: cargo run -- serve --configuration example/metadata.json &
+        working-directory: main
+
+      - uses: actions/checkout@v4
+        with:
+          repository: hasura/ndc-spec
+          path: tests
+
+      - run: cargo run -- test --endpoint http://0.0.0.0:8100
+        working-directory: tests/ndc-test
