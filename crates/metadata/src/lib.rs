@@ -1,32 +1,30 @@
 pub mod ndc;
 pub mod odata;
 
-use std::collections::{BTreeMap, BTreeSet};
-
 /// Translate an EDMX document into the ndc-odata metadata type.
 pub fn prepare_odata_edmx(metadata: odata::EDMX) -> ndc::Schema {
-    let mut collections: Vec<ndc::Collection> = Vec::new(); // TODO: don't use a Vec for appends.
-    let mut scalar_types: BTreeSet<String> = BTreeSet::new();
-    let mut object_types: BTreeMap<String, ndc::ObjectType> = BTreeMap::new();
-    let mut functions: Vec<ndc::Function> = Vec::new();
-    let mut procedures: Vec<ndc::Procedure> = Vec::new();
+    let schemata = metadata.data_services.schema;
 
-    for schema in &metadata.data_services.schema {
-        let mut scalar_type_additions = find_scalar_types(&schema);
-        scalar_types.append(&mut scalar_type_additions);
-
-        let mut object_type_additions = find_object_types(&schema);
-        object_types.append(&mut object_type_additions);
-
-        let mut collection_additions = find_collections(&schema);
-        collections.append(&mut collection_additions);
-
-        let mut function_additions = find_functions(&schema);
-        functions.append(&mut function_additions);
-
-        let mut procedure_additions = find_procedures(&schema);
-        procedures.append(&mut procedure_additions);
-    }
+    let object_types = schemata
+        .iter()
+        .flat_map(ndc::ObjectType::extract_from)
+        .collect();
+    let scalar_types = schemata
+        .iter()
+        .flat_map(ndc::ScalarType::extract_from)
+        .collect();
+    let functions = schemata
+        .iter()
+        .flat_map(ndc::Function::extract_from)
+        .collect();
+    let procedures = schemata
+        .iter()
+        .flat_map(ndc::Procedure::extract_from)
+        .collect();
+    let collections = schemata
+        .iter()
+        .flat_map(ndc::Collection::extract_from)
+        .collect();
 
     ndc::Schema {
         collections,
@@ -34,207 +32,5 @@ pub fn prepare_odata_edmx(metadata: odata::EDMX) -> ndc::Schema {
         scalar_types,
         functions,
         procedures,
-    }
-}
-
-pub fn find_functions(schema: &odata::Schema) -> Vec<ndc::Function> {
-    schema
-        .functions
-        .iter()
-        .map(|function| ndc::Function {
-            name: function.name.clone(),
-            result_type: type_description_to_type(&function.return_type.r#type),
-            arguments: function
-                .parameters
-                .iter()
-                .map(|p| (p.name.clone(), type_description_to_type(&p.r#type)))
-                .collect(),
-        })
-        .collect()
-}
-
-pub fn find_procedures(schema: &odata::Schema) -> Vec<ndc::Procedure> {
-    schema
-        .actions
-        .iter()
-        .filter_map(|action| {
-            action
-                .return_type
-                .clone()
-                .map(|return_type| ndc::Procedure {
-                    name: action.name.clone(),
-                    result_type: type_description_to_type(&return_type.r#type),
-                    arguments: action
-                        .parameters
-                        .iter()
-                        .map(|p| (p.name.clone(), type_description_to_type(&p.r#type)))
-                        .collect(),
-                })
-        })
-        .collect()
-}
-
-/// OData's notion of entity sets maps pretty neatly onto the NDC notion of collections, so for
-/// now, we just transform one into the other.
-pub fn find_collections(schema: &odata::Schema) -> Vec<ndc::Collection> {
-    schema
-        .entity_container
-        .entity_sets
-        .iter()
-        .map(|entity_set| ndc::Collection {
-            name: entity_set.name.clone(),
-            collection_type: entity_set.entity_type.clone(),
-            key: type_key(schema, &entity_set.entity_type),
-        })
-        .collect()
-}
-
-/// Given an entity typ name, check the schema to see whether it has a uniquely identifying key.
-fn type_key(schema: &odata::Schema, name: &String) -> Option<String> {
-    let matches =
-        |entity: &&odata::EntityType| &format!("{}.{}", schema.namespace, entity.name) == name;
-
-    schema
-        .entity_types
-        .iter()
-        .find(matches)
-        .and_then(|entity_type| entity_type.key.clone())
-        .map(|odata_key| odata_key.property_ref.name)
-}
-
-/// Traverse the EDMX document looking for scalar types. If collections are found, the singular
-/// types should be extracted.
-pub fn find_scalar_types(schema: &odata::Schema) -> BTreeSet<String> {
-    let mut scalar_types = BTreeSet::new();
-
-    schema
-        .entity_types
-        .iter()
-        .flat_map(|entity_type| entity_type.properties.clone())
-        .map(|property| property.r#type.inner.underlying_type())
-        .for_each(|inner| {
-            scalar_types.insert(inner);
-        });
-
-    schema
-        .complex_types
-        .iter()
-        .flat_map(|complex_type| complex_type.properties.clone())
-        .map(|property| property.r#type.inner.underlying_type())
-        .for_each(|inner| {
-            scalar_types.insert(inner);
-        });
-
-    schema
-        .enum_types
-        .iter()
-        .map(|enum_type| enum_type.name.to_string())
-        .map(|name| format!("{}.{}", schema.namespace, name))
-        .for_each(|scalar_type| {
-            scalar_types.insert(scalar_type);
-        });
-
-    schema
-        .entity_container
-        .singletons
-        .iter()
-        .map(|singleton| singleton.r#type.inner.underlying_type())
-        .for_each(|inner| {
-            scalar_types.insert(inner);
-        });
-
-    scalar_types
-}
-
-/// Traverse the EDMX document looking for object types. The concept of object types in the NDC
-/// spec maps quite neatly to the OData concepts of entity types and complex types.
-pub fn find_object_types(schema: &odata::Schema) -> BTreeMap<String, ndc::ObjectType> {
-    let mut object_types = BTreeMap::new();
-
-    let property_to_field = |property: odata::Property| {
-        let name = property.name.clone();
-        let field = type_description_to_type(&property.r#type);
-
-        (name, field)
-    };
-
-    schema
-        .entity_types
-        .clone()
-        .into_iter()
-        .for_each(|entity_type| {
-            let object_type = odata::types::Type::Qualified {
-                schema: schema.namespace.clone(),
-                r#type: entity_type.name,
-            };
-
-            let fields = entity_type
-                .properties
-                .into_iter()
-                .map(property_to_field)
-                .collect();
-
-            object_types.insert(object_type.as_string(), ndc::ObjectType { fields });
-        });
-
-    schema
-        .complex_types
-        .clone()
-        .into_iter()
-        .for_each(|complex_type| {
-            let object_type = odata::types::Type::Qualified {
-                schema: schema.namespace.clone(),
-                r#type: complex_type.name,
-            };
-
-            let fields = complex_type
-                .properties
-                .into_iter()
-                .map(property_to_field)
-                .collect();
-
-            object_types.insert(object_type.as_string(), ndc::ObjectType { fields });
-        });
-
-    object_types
-}
-
-// --- Helpers
-
-/// OData has a slightly different language for types (for example, you can't have a nullable array
-/// of nullable elements: all array elements are non-null), so we have to do a sightly clunky
-/// mapping.
-fn type_description_to_type(input: &odata::TypeDescription) -> ndc::Type {
-    match input {
-        odata::TypeDescription {
-            nullable: true,
-            inner,
-        } => ndc::Type::Nullable {
-            underlying_type: Box::new(type_description_to_type(&odata::TypeDescription {
-                inner: inner.clone(),
-                nullable: false,
-            })),
-        },
-
-        odata::TypeDescription {
-            nullable: _,
-            inner: odata::types::Type::Collection { element_type },
-        } => ndc::Type::Collection {
-            element_type: Box::new(type_description_to_type(&odata::TypeDescription {
-                inner: *element_type.clone(),
-                nullable: false,
-            })),
-        },
-
-        odata::TypeDescription {
-            nullable: _,
-            inner:
-                odata::types::Type::Qualified {
-                    schema: _,
-                    r#type: _,
-                },
-        } => ndc::Type::Named {
-            name: input.inner.underlying_type(),
-        },
     }
 }

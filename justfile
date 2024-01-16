@@ -9,7 +9,7 @@ check-format:
   @cargo fmt --all --check
 
 machete:
-  @cargo machete
+  @cargo machete --with-metadata
 
 test:
   @cargo test
@@ -33,9 +33,12 @@ update metadata="example/metadata.json" port="9100":
   @mv {{metadata}}.tmp {{metadata}}
 
   @echo "Fetching updated schema..."
-  @curl localhost:{{ port }} \
+  @curl localhost:{{ port }} --fail-with-body \
     -H 'Content-Type: application/json' -X POST \
-    -d '@{{metadata}}' | jq > {{metadata}}.tmp
-  @mv {{metadata}}.tmp {{metadata}}
+    -d '@{{metadata}}' -o {{metadata}}.tmp
+
+  @cat {{metadata}}.tmp | jq > {{metadata}}.pretty.tmp
+  @mv  {{metadata}}.pretty.tmp {{metadata}}
+  @rm  {{metadata}}.tmp
 
   @echo "Successfully updated '{{metadata}}'."

@@ -1,34 +1,35 @@
+//! The query "engine": creates requests and interprets responses.
+
+pub mod fields;
+pub mod order_by;
+pub mod query;
 pub mod request;
+pub mod response;
+
+pub use fields::*;
+pub use order_by::*;
+pub use query::*;
+pub use request::*;
+pub use response::*;
 
 use indexmap::IndexMap;
 use metadata::ndc;
 use ndc_sdk::{connector, models};
-use serde::Deserialize;
-use serde_json::Value;
-use std::collections::BTreeMap;
-use url_builder::URLBuilder;
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct Response {
-    #[serde(default)]
-    pub value: Vec<BTreeMap<String, Value>>,
-}
 
 pub async fn execute_query(
     configuration: &ndc::Configuration,
     request: models::QueryRequest,
 ) -> Result<models::QueryResponse, connector::QueryError> {
-    let mut builder = URLBuilder::new();
+    let request_structure = Request::from_user_request(configuration, &request)
+        .map_err(Box::from)
+        .map_err(connector::QueryError::Other)?;
 
-    builder
-        .set_protocol(&configuration.api_endpoint.protocol)
-        .set_host(&configuration.api_endpoint.authority)
-        .add_route(&configuration.api_endpoint.path);
+    let request_url = request_structure
+        .to_url()
+        .map_err(Box::from)
+        .map_err(connector::QueryError::Other)?;
 
-    request::request_to_url(&mut builder, &request);
-    let built = builder.build();
-
-    let body: Response = reqwest::get(built)
+    let body: Response = reqwest::get(request_url)
         .await
         .map_err(Box::from)
         .map_err(connector::QueryError::Other)?
@@ -37,15 +38,22 @@ pub async fn execute_query(
         .map_err(Box::from)
         .map_err(connector::QueryError::Other)?;
 
-    Ok(models::QueryResponse(Vec::from([models::RowSet {
-        rows: Some(body.value.into_iter().map(prepare_row).collect()),
-        aggregates: None,
-    }])))
-}
+    let mut rows = Vec::new();
 
-fn prepare_row(result: BTreeMap<String, Value>) -> IndexMap<String, models::RowFieldValue> {
-    result
-        .into_iter()
-        .map(|(key, value)| (key, models::RowFieldValue(value)))
-        .collect()
+    for result_row in &body.value {
+        let mut row = IndexMap::new();
+
+        for (field, value) in Response::interpret(result_row, &request_structure.query) {
+            row.insert(field.clone(), models::RowFieldValue(value));
+        }
+
+        rows.push(row);
+    }
+
+    let row_set = models::RowSet {
+        rows: Some(rows),
+        aggregates: None,
+    };
+
+    Ok(models::QueryResponse(Vec::from([row_set])))
 }

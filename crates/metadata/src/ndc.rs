@@ -1,89 +1,34 @@
-pub mod url;
+pub mod collections;
+pub mod endpoint;
+pub mod functions;
+pub mod object_types;
+pub mod procedures;
+pub mod schema;
+pub mod types;
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet};
+
+pub use collections::*;
+pub use endpoint::*;
+pub use functions::*;
+pub use object_types::*;
+pub use procedures::*;
+pub use schema::*;
+pub use types::*;
 
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct Configuration {
-    pub api_endpoint: url::Endpoint,
+    pub api_endpoint: Endpoint,
     pub schema: Schema,
 }
 
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+#[derive(Deserialize, JsonSchema, Serialize, Clone, Debug, Default)]
 pub struct RawConfiguration {
+    // For a basic configuration, this is all we need: we can populate the `Schema` from the OData
+    // endpoint using a `/$metadata` introspection query.
     pub api_endpoint: String,
 
     #[serde(default)]
     pub schema: Schema,
-}
-
-impl Default for RawConfiguration {
-    fn default() -> Self {
-        RawConfiguration {
-            api_endpoint: Default::default(),
-            schema: Default::default(),
-        }
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
-pub struct Schema {
-    #[serde(default)]
-    pub collections: Vec<Collection>,
-    #[serde(default)]
-    pub scalar_types: BTreeSet<String>,
-    #[serde(default)]
-    pub object_types: BTreeMap<String, ObjectType>,
-    #[serde(default)]
-    pub functions: Vec<Function>,
-    #[serde(default)]
-    pub procedures: Vec<Procedure>,
-}
-
-impl Default for Schema {
-    fn default() -> Self {
-        Schema {
-            collections: Default::default(),
-            object_types: Default::default(),
-            scalar_types: Default::default(),
-            functions: Default::default(),
-            procedures: Default::default(),
-        }
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
-pub struct Collection {
-    pub name: String,
-    pub key: Option<String>,
-    pub collection_type: String,
-}
-
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
-pub struct ObjectType {
-    #[serde(flatten)]
-    pub fields: BTreeMap<String, Type>,
-}
-
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
-pub struct Function {
-    pub name: String,
-    pub arguments: BTreeMap<String, Type>,
-    pub result_type: Type,
-}
-
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
-pub struct Procedure {
-    pub name: String,
-    pub arguments: BTreeMap<String, Type>,
-    pub result_type: Type,
-}
-
-#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
-#[serde(tag = "type")]
-pub enum Type {
-    Collection { element_type: Box<Type> },
-    Nullable { underlying_type: Box<Type> },
-    Named { name: String },
 }

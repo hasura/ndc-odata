@@ -2,11 +2,12 @@
 resolver = "2"
 
 package.version = "0.1.0"
+
 package.edition = "2021"
+
 package.license = "Apache-2.0"
 
 members = [
   "crates/ndc-odata",
   "crates/metadata",
-  "crates/map-iterators",
 ]
