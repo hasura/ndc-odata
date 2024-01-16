@@ -1,0 +1,173 @@
+---
+source: crates/ndc-odata/tests/lib.rs
+assertion_line: 36
+expression: "request.send().unwrap().json::<serde_json::Value>().unwrap()"
+input_file: crates/ndc-odata/tests/goldenfiles/query/relationships.json
+---
+[
+  {
+    "rows": [
+      {
+        "first_name": "Russell",
+        "last_name": "Whyte",
+        "best_friend": {
+          "FirstName": "Scott",
+          "LastName": "Ketchum"
+        }
+      },
+      {
+        "first_name": "Scott",
+        "last_name": "Ketchum",
+        "best_friend": {
+          "FirstName": "Russell",
+          "LastName": "Whyte"
+        }
+      },
+      {
+        "first_name": "Ronald",
+        "last_name": "Mundy",
+        "best_friend": {
+          "FirstName": "Scott",
+          "LastName": "Ketchum"
+        }
+      },
+      {
+        "first_name": "Javier",
+        "last_name": "Alfred",
+        "best_friend": {
+          "FirstName": "Vincent",
+          "LastName": "Calabrese"
+        }
+      },
+      {
+        "first_name": "Willie",
+        "last_name": "Ashmore",
+        "best_friend": {
+          "FirstName": "Vincent",
+          "LastName": "Calabrese"
+        }
+      },
+      {
+        "first_name": "Vincent",
+        "last_name": "Calabrese",
+        "best_friend": {
+          "FirstName": "Javier",
+          "LastName": "Alfred"
+        }
+      },
+      {
+        "first_name": "Clyde",
+        "last_name": "Guess",
+        "best_friend": {
+          "FirstName": "Keith",
+          "LastName": "Pinckney"
+        }
+      },
+      {
+        "first_name": "Keith",
+        "last_name": "Pinckney",
+        "best_friend": {
+          "FirstName": "Clyde",
+          "LastName": "Guess"
+        }
+      },
+      {
+        "first_name": "Marshall",
+        "last_name": "Garay",
+        "best_friend": {
+          "FirstName": "Keith",
+          "LastName": "Pinckney"
+        }
+      },
+      {
+        "first_name": "Ryan",
+        "last_name": "Theriault",
+        "best_friend": {
+          "FirstName": "Elaine",
+          "LastName": "Stewart"
+        }
+      },
+      {
+        "first_name": "Elaine",
+        "last_name": "Stewart",
+        "best_friend": {
+          "FirstName": "Ryan",
+          "LastName": "Theriault"
+        }
+      },
+      {
+        "first_name": "Sallie",
+        "last_name": "Sampson",
+        "best_friend": {
+          "FirstName": "Joni",
+          "LastName": "Rosales"
+        }
+      },
+      {
+        "first_name": "Joni",
+        "last_name": "Rosales",
+        "best_friend": {
+          "FirstName": "Sallie",
+          "LastName": "Sampson"
+        }
+      },
+      {
+        "first_name": "Georgina",
+        "last_name": "Barlow",
+        "best_friend": {
+          "FirstName": "Angel",
+          "LastName": "Huffman"
+        }
+      },
+      {
+        "first_name": "Angel",
+        "last_name": "Huffman",
+        "best_friend": {
+          "FirstName": "Georgina",
+          "LastName": "Barlow"
+        }
+      },
+      {
+        "first_name": "Laurel",
+        "last_name": "Osborn",
+        "best_friend": {
+          "FirstName": "Sandy",
+          "LastName": "Osborn"
+        }
+      },
+      {
+        "first_name": "Sandy",
+        "last_name": "Osborn",
+        "best_friend": {
+          "FirstName": "Laurel",
+          "LastName": "Osborn"
+        }
+      },
+      {
+        "first_name": "Ursula",
+        "last_name": "Bright",
+        "best_friend": {
+          "@odata.type": "#Trippin.Employee",
+          "FirstName": "Krista",
+          "LastName": "Kemp"
+        }
+      },
+      {
+        "first_name": "Genevieve",
+        "last_name": "Reeves",
+        "best_friend": {
+          "FirstName": "Ursula",
+          "LastName": "Bright"
+        }
+      },
+      {
+        "first_name": "Krista",
+        "last_name": "Kemp",
+        "best_friend": {
+          "FirstName": "Ursula",
+          "LastName": "Bright"
+        }
+      }
+    ]
+  }
+]

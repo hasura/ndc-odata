@@ -14,6 +14,18 @@
           "type": "column",
           "column": "LastName"
         }
+      },
+      "order_by": {
+        "elements": [
+          {
+            "target": {
+              "type": "column",
+              "name": "LastName",
+              "path": []
+            },
+            "order_direction": "asc"
+          }
+        ]
       }
     },
     "collection_relationships": {}

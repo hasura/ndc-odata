@@ -106,13 +106,10 @@
             }
           },
           "Peers": {
-            "type": "Collection",
-            "element_type": {
-              "type": "Nullable",
-              "underlying_type": {
-                "type": "Named",
-                "name": "Trippin.Person"
-              }
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
             }
           }
         }
@@ -140,20 +137,29 @@
       "Trippin.Flight": {
         "fields": {
           "Airline": {
-            "type": "Named",
-            "name": "Trippin.Airline"
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
+            }
           },
           "FlightNumber": {
             "type": "Named",
             "name": "Edm.String"
           },
           "From": {
-            "type": "Named",
-            "name": "Trippin.Airport"
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
+            }
           },
           "To": {
-            "type": "Named",
-            "name": "Trippin.Airport"
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
+            }
           }
         }
       },
@@ -183,13 +189,10 @@
             }
           },
           "DirectReports": {
-            "type": "Collection",
-            "element_type": {
-              "type": "Nullable",
-              "underlying_type": {
-                "type": "Named",
-                "name": "Trippin.Person"
-              }
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
             }
           }
         }
@@ -211,8 +214,11 @@
             "name": "Edm.Int"
           },
           "BestFriend": {
-            "type": "Named",
-            "name": "Trippin.Person"
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
+            }
           },
           "Emails": {
             "type": "Collection",
@@ -252,13 +258,10 @@
             }
           },
           "Friends": {
-            "type": "Collection",
-            "element_type": {
-              "type": "Nullable",
-              "underlying_type": {
-                "type": "Named",
-                "name": "Trippin.Person"
-              }
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.String"
             }
           },
           "Gender": {
@@ -281,13 +284,10 @@
             "name": "Edm.String"
           },
           "Trips": {
-            "type": "Collection",
-            "element_type": {
-              "type": "Nullable",
-              "underlying_type": {
-                "type": "Named",
-                "name": "Trippin.Trip"
-              }
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Int"
             }
           },
           "UserName": {
@@ -368,13 +368,10 @@
             "name": "Edm.String"
           },
           "PlanItems": {
-            "type": "Collection",
-            "element_type": {
-              "type": "Nullable",
-              "underlying_type": {
-                "type": "Named",
-                "name": "Trippin.PlanItem"
-              }
+            "type": "Nullable",
+            "underlying_type": {
+              "type": "Named",
+              "name": "Edm.Int"
             }
           },
           "ShareId": {

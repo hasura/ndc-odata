@@ -14,7 +14,9 @@
           "type": "column",
           "column": "LastName"
         }
-      }
+      },
+      "limit": 10,
+      "offset": 10
     },
     "collection_relationships": {}
   }

@@ -122,13 +122,10 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "Peers": {
           "type": {
-            "type": "array",
-            "element_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "type": "named",
-                "name": "Trippin.Person"
-              }
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.String"
             }
           }
         }
@@ -164,8 +161,11 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
       "fields": {
         "Airline": {
           "type": {
-            "type": "named",
-            "name": "Trippin.Airline"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.String"
+            }
           }
         },
         "FlightNumber": {
@@ -176,14 +176,20 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "From": {
           "type": {
-            "type": "named",
-            "name": "Trippin.Airport"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.String"
+            }
           }
         },
         "To": {
           "type": {
-            "type": "named",
-            "name": "Trippin.Airport"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.String"
+            }
           }
         }
       }
@@ -223,13 +229,10 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "DirectReports": {
           "type": {
-            "type": "array",
-            "element_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "type": "named",
-                "name": "Trippin.Person"
-              }
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.String"
             }
           }
         }
@@ -257,8 +260,11 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "BestFriend": {
           "type": {
-            "type": "named",
-            "name": "Trippin.Person"
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.String"
+            }
           }
         },
         "Emails": {
@@ -308,13 +314,10 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "Friends": {
           "type": {
-            "type": "array",
-            "element_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "type": "named",
-                "name": "Trippin.Person"
-              }
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.String"
             }
           }
         },
@@ -347,13 +350,10 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "Trips": {
           "type": {
-            "type": "array",
-            "element_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "type": "named",
-                "name": "Trippin.Trip"
-              }
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.Int"
             }
           }
         },
@@ -458,13 +458,10 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "PlanItems": {
           "type": {
-            "type": "array",
-            "element_type": {
-              "type": "nullable",
-              "underlying_type": {
-                "type": "named",
-                "name": "Trippin.PlanItem"
-              }
+            "type": "nullable",
+            "underlying_type": {
+              "type": "named",
+              "name": "Edm.Int"
             }
           }
         },

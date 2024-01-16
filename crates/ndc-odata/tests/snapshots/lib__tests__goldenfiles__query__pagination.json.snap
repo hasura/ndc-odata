@@ -1,0 +1,51 @@
+---
+source: crates/ndc-odata/tests/lib.rs
+expression: "request.send().unwrap().json::<serde_json::Value>().unwrap()"
+input_file: crates/ndc-odata/tests/goldenfiles/query/pagination.json
+---
+[
+  {
+    "rows": [
+      {
+        "first_name": "Marshall",
+        "last_name": "Garay"
+      },
+      {
+        "first_name": "Ronald",
+        "last_name": "Mundy"
+      },
+      {
+        "first_name": "Russell",
+        "last_name": "Whyte"
+      },
+      {
+        "first_name": "Ryan",
+        "last_name": "Theriault"
+      },
+      {
+        "first_name": "Sallie",
+        "last_name": "Sampson"
+      },
+      {
+        "first_name": "Sandy",
+        "last_name": "Osborn"
+      },
+      {
+        "first_name": "Scott",
+        "last_name": "Ketchum"
+      },
+      {
+        "first_name": "Ursula",
+        "last_name": "Bright"
+      },
+      {
+        "first_name": "Vincent",
+        "last_name": "Calabrese"
+      },
+      {
+        "first_name": "Willie",
+        "last_name": "Ashmore"
+      }
+    ]
+  }
+]

@@ -13,6 +13,9 @@ pub struct ComplexType {
     #[serde(rename = "@Name")]
     pub name: String,
 
+    // @TODO: we should expand base types as soon as possible: right now, for
+    // example, if the `key` of an entity type is a property on the base type,
+    // we'll crash.
     #[serde(rename = "@BaseType")]
     pub base_type: Option<String>,
 
@@ -95,6 +98,23 @@ impl Type {
         match &self {
             Type::Collection { elements } => elements.underlying_type(),
             Type::Qualified { schema, name } => format!("{schema}.{name}"),
+        }
+    }
+
+    // @TODO: this is a real wart. The problem is that a type is implicitly
+    // namespaced by the schema in which it is declared, _but_ every reference
+    // to it will be /expicitly/ namespaced. Ideally, what we'd do is parse the
+    // OData metadata and add the schema namespace to every type we parse as
+    // we parse it. However, that would mean dealing with Serde's dark corners.
+    //
+    // Instead, for now, we assume that the APIs we're interested in will live
+    // within a single schema, so we're always safe to strip the schema because
+    // it should always be the right one anyway. This is not a good long-term
+    // solution.
+    pub fn schemaless_name(&self) -> String {
+        match &self {
+            Type::Collection { elements } => elements.schemaless_name(),
+            Type::Qualified { schema: _, name } => name.clone(),
         }
     }
 

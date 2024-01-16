@@ -28,7 +28,10 @@ impl ObjectType {
                 name: entity_type.name.clone(),
             };
 
-            object_types.insert(object_type.as_string(), from_entity_type(&entity_type));
+            object_types.insert(
+                object_type.as_string(),
+                from_entity_type(schema, &entity_type),
+            );
         }
 
         for complex_type in &schema.complex_types {
@@ -38,7 +41,10 @@ impl ObjectType {
                 name: complex_type.name.clone(),
             };
 
-            object_types.insert(object_type.as_string(), from_complex_type(&complex_type));
+            object_types.insert(
+                object_type.as_string(),
+                from_complex_type(schema, &complex_type),
+            );
         }
 
         object_types
@@ -46,7 +52,7 @@ impl ObjectType {
 }
 
 /// Create an object type based on a complex type underneath.
-fn from_complex_type(structure: &odata::ComplexType) -> ObjectType {
+fn from_complex_type(schema: &odata::Schema, structure: &odata::ComplexType) -> ObjectType {
     let mut fields = BTreeMap::new();
 
     for property in &structure.properties {
@@ -56,20 +62,15 @@ fn from_complex_type(structure: &odata::ComplexType) -> ObjectType {
         );
     }
 
-    // We define every navigation property as a "field" with the property's name in the `ndc-spec`,
-    // and we're going to use this as our faux foreign key.
-    for navigation_property in &structure.navigation_properties {
-        fields.insert(
-            navigation_property.name.clone(),
-            super::Type::from_type_data(&navigation_property.r#type),
-        );
-    }
-
+    fields.append(&mut generate_navigation_properties(
+        schema,
+        &structure.navigation_properties,
+    ));
     ObjectType { fields }
 }
 
 /// Create an object type based on an entity type underneath.
-fn from_entity_type(structure: &odata::EntityType) -> ObjectType {
+fn from_entity_type(schema: &odata::Schema, structure: &odata::EntityType) -> ObjectType {
     let mut fields = BTreeMap::new();
 
     for property in &structure.properties {
@@ -79,13 +80,44 @@ fn from_entity_type(structure: &odata::EntityType) -> ObjectType {
         );
     }
 
-    // ibid.
-    for navigation_property in &structure.navigation_properties {
+    fields.append(&mut generate_navigation_properties(
+        schema,
+        &structure.navigation_properties,
+    ));
+    ObjectType { fields }
+}
+
+fn generate_navigation_properties(
+    schema: &odata::Schema,
+    navigation_properties: &Vec<odata::NavigationProperty>,
+) -> BTreeMap<String, super::Type> {
+    let mut fields = BTreeMap::new();
+
+    for navigation_property in navigation_properties {
+        // See `crates/metadata/src/odata/types` for an extended rant about this. TL;DR, stripping the schema is not a
+        // good idea, but deadlines are tight and I don't really have time to write a more complex schema parser.
+        let target_type = navigation_property.r#type.inner.schemaless_name();
+
+        // Find the entity type of the target of this particular navigation property. We also currently assume that
+        // metadata is valid - eventually, we'll verify all the invariants on which we rely in `validate_configuration`.
+        let target = schema.entity_type(&target_type).clone().unwrap();
+
+        // The "primary key" of the target collection.
+        let key = target.key(schema);
+
+        // Find the type of the "primary key" of the target collection.
+        let entity_type = &target
+            .properties
+            .iter()
+            .find(|p| p.name == key)
+            .unwrap()
+            .r#type;
+
         fields.insert(
             navigation_property.name.clone(),
-            super::Type::from_type_data(&navigation_property.r#type),
+            super::Type::from_type_data(&entity_type),
         );
     }
 
-    ObjectType { fields }
+    fields
 }
