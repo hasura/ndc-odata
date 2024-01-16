@@ -11,8 +11,8 @@ pub struct Request {
 impl Request {
     pub fn from_user_request(
         configuration: &ndc::Configuration,
-        request: &models::QueryRequest
-    ) -> Result<Self,String> {
+        request: &models::QueryRequest,
+    ) -> Result<Self, String> {
         Ok(Request {
             api_endpoint: configuration.api_endpoint.clone(),
             collection: request.collection.clone(),
@@ -35,5 +35,4 @@ impl Request {
 
         Ok(builder.build())
     }
-
 }

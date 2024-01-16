@@ -13,7 +13,7 @@ pub struct Response {
 impl Response {
     pub fn interpret(
         result_row: &Map<String, Value>,
-        query_structure: &super::Query
+        query_structure: &super::Query,
     ) -> Map<String, Value> {
         let mut prepared = Map::new();
         println!("{:?}", result_row);

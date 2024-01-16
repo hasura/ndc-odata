@@ -38,7 +38,11 @@ impl Query {
     }
 
     pub fn odata_fields(&self) -> Vec<&String> {
-        self.fields.columns.values().map(|super::Original(name)| name).collect()
+        self.fields
+            .columns
+            .values()
+            .map(|super::Original(name)| name)
+            .collect()
     }
 
     pub fn prepare_parameters(&self) -> BTreeMap<String, String> {
@@ -95,4 +99,3 @@ impl Query {
         parameters
     }
 }
-
