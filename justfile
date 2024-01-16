@@ -9,7 +9,7 @@ check-format:
   @cargo fmt --all --check
 
 machete:
-  @cargo machete
+  @cargo machete --with-metadata
 
 test:
   @cargo test
