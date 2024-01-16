@@ -39,8 +39,8 @@ from the [`ndc-spec` list](https://hasura.github.io/ndc-spec).
     - [X] Pagination
     - [ ] Aggregates
     - [ ] Arguments
-    - [ ] Relationships
+    - [X] Relationships
     - [ ] Variables
 - [ ] Mutations
     - [ ] Procedures
-- [ ] Explain
+- [X] Explain
