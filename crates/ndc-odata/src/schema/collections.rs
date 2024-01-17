@@ -9,6 +9,8 @@ pub fn translate(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionIn
     for collection in collections {
         let mut foreign_keys = BTreeMap::new();
 
+        // Each collection has a key, so we can always generate a "foreign key" relationship to any
+        // entity for which we have a navigation property.
         for (relationship_target, foreign_collection) in &collection.relationships {
             let target_key = collections
                 .iter()
@@ -27,6 +29,9 @@ pub fn translate(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionIn
             );
         }
 
+        println!("{:?}", collection.collection_type.to_string());
+
+        // Using the collection's own key, we can also generate a unique key constraint.
         let primary_key_constraint = format!("{}By{}", collection.name, collection.key.clone());
         let uniqueness_constraint = models::UniquenessConstraint {
             unique_columns: vec![collection.key.clone()],
@@ -34,7 +39,7 @@ pub fn translate(collections: &Vec<ndc::Collection>) -> Vec<models::CollectionIn
 
         results.push(models::CollectionInfo {
             name: collection.name.clone(),
-            collection_type: collection.collection_type.clone(),
+            collection_type: collection.collection_type.to_string(),
             foreign_keys,
             description: None,
             arguments: BTreeMap::new(),

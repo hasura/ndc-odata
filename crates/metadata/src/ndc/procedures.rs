@@ -1,9 +1,12 @@
+//! Functions relating to extracting procedures from OData metadata.
+
 use crate::ndc;
 use crate::odata::{functions, schema};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+/// A description of a procedure in `ndc-odata` metadata.
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct Procedure {
     pub name: String,

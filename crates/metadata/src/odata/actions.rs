@@ -10,7 +10,6 @@ pub struct Action {
     #[serde(rename = "@Name")]
     pub name: String,
 
-    // TODO: is this important to us?
     #[serde(default)]
     #[serde(rename = "@IsBound")]
     #[serde(deserialize_with = "super::helpers::str_to_bool")]

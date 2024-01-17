@@ -1,3 +1,5 @@
+//! The `ndc-odata` metadata structure.
+
 pub mod collections;
 pub mod endpoint;
 pub mod functions;

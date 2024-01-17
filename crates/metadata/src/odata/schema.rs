@@ -36,9 +36,6 @@ pub struct Schema {
     pub entity_container: super::EntityContainer,
 }
 
-// @TODO: _all_ these definitions should probably pay attention to what is and isn't in the entity
-// container: we should only resolve functions that are imported. To what extent should we trust
-// that the OData metadata we're working with is valid?
 impl Schema {
     /// Look up a complex type by name within this schema.
     pub fn complex_type(&self, name: &str) -> Option<super::ComplexType> {
@@ -74,6 +71,8 @@ impl Schema {
     }
 
     /// Look up a function by name within this schema.
+    /// @TODO: we should really be looking this up in the entity container to check it is exposed
+    ///        in the API, and _then_ get the content.
     pub fn function(&self, name: &str) -> Option<super::Function> {
         self.functions
             .iter()
@@ -82,6 +81,8 @@ impl Schema {
     }
 
     /// Look up an action by name within this schema.
+    /// @TODO: we should really be looking this up in the entity container to check it is exposed
+    ///        in the API, and _then_ get the content.
     pub fn action(&self, name: &str) -> Option<super::Action> {
         self.actions
             .iter()

@@ -3,7 +3,6 @@
 use serde::Deserialize;
 
 /// An enum type defines a variant, with each (nullary) constructor mapped to an integer value.
-/// @TODO: how are these represented in requests/responses? Do we have to do any mapping?
 #[derive(Clone, Debug, Deserialize)]
 pub struct EnumType {
     #[serde(rename = "@Name")]

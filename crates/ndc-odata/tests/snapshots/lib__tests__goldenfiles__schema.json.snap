@@ -79,6 +79,18 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
     },
     "Trippin.AirportLocation": {
       "fields": {
+        "Address": {
+          "type": {
+            "type": "named",
+            "name": "Edm.String"
+          }
+        },
+        "City": {
+          "type": {
+            "type": "named",
+            "name": "Trippin.City"
+          }
+        },
         "Loc": {
           "type": {
             "type": "named",
@@ -111,6 +123,12 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
     },
     "Trippin.Employee": {
       "fields": {
+        "BestFriend": {
+          "type": {
+            "type": "named",
+            "name": "Edm.String"
+          }
+        },
         "Cost": {
           "type": {
             "type": "nullable",
@@ -120,13 +138,22 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
             }
           }
         },
+        "Friends": {
+          "type": {
+            "type": "named",
+            "name": "Edm.String"
+          }
+        },
         "Peers": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.String"
-            }
+            "type": "named",
+            "name": "Edm.String"
+          }
+        },
+        "Trips": {
+          "type": {
+            "type": "named",
+            "name": "Edm.Int"
           }
         }
       }
@@ -149,10 +176,22 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
     },
     "Trippin.EventLocation": {
       "fields": {
+        "Address": {
+          "type": {
+            "type": "named",
+            "name": "Edm.String"
+          }
+        },
         "BuildingInfo": {
           "type": {
             "type": "named",
             "name": "Edm.String"
+          }
+        },
+        "City": {
+          "type": {
+            "type": "named",
+            "name": "Trippin.City"
           }
         }
       }
@@ -161,11 +200,8 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
       "fields": {
         "Airline": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.String"
-            }
+            "type": "named",
+            "name": "Edm.String"
           }
         },
         "FlightNumber": {
@@ -176,20 +212,14 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "From": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.String"
-            }
+            "type": "named",
+            "name": "Edm.String"
           }
         },
         "To": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.String"
-            }
+            "type": "named",
+            "name": "Edm.String"
           }
         }
       }
@@ -212,6 +242,12 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
     },
     "Trippin.Manager": {
       "fields": {
+        "BestFriend": {
+          "type": {
+            "type": "named",
+            "name": "Edm.String"
+          }
+        },
         "BossOffice": {
           "type": {
             "type": "named",
@@ -229,11 +265,20 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "DirectReports": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.String"
-            }
+            "type": "named",
+            "name": "Edm.String"
+          }
+        },
+        "Friends": {
+          "type": {
+            "type": "named",
+            "name": "Edm.String"
+          }
+        },
+        "Trips": {
+          "type": {
+            "type": "named",
+            "name": "Edm.Int"
           }
         }
       }
@@ -260,11 +305,8 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "BestFriend": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.String"
-            }
+            "type": "named",
+            "name": "Edm.String"
           }
         },
         "Emails": {
@@ -314,11 +356,8 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "Friends": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.String"
-            }
+            "type": "named",
+            "name": "Edm.String"
           }
         },
         "Gender": {
@@ -350,11 +389,8 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "Trips": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.Int"
-            }
+            "type": "named",
+            "name": "Edm.Int"
           }
         },
         "UserName": {
@@ -458,11 +494,8 @@ input_file: crates/ndc-odata/tests/goldenfiles/schema.json
         },
         "PlanItems": {
           "type": {
-            "type": "nullable",
-            "underlying_type": {
-              "type": "named",
-              "name": "Edm.Int"
-            }
+            "type": "named",
+            "name": "Edm.Int"
           }
         },
         "ShareId": {

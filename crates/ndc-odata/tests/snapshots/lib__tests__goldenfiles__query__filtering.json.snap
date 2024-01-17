@@ -1,0 +1,19 @@
+---
+source: crates/ndc-odata/tests/lib.rs
+expression: "request.send().unwrap().json::<serde_json::Value>().unwrap()"
+input_file: crates/ndc-odata/tests/goldenfiles/query/filtering.json
+---
+[
+  {
+    "rows": [
+      {
+        "first_name": "Laurel",
+        "last_name": "Osborn"
+      },
+      {
+        "first_name": "Sandy",
+        "last_name": "Osborn"
+      }
+    ]
+  }
+]

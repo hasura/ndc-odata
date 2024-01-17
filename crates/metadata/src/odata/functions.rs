@@ -1,4 +1,4 @@
-//! Structures for describing actions in the OData specification.
+//! Structures for describing functions in the OData specification.
 
 use serde::Deserialize;
 

@@ -2,9 +2,10 @@ use itertools::Itertools;
 use ndc_sdk::models;
 use std::collections::BTreeMap;
 
-#[derive(Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Eq, PartialEq)]
 pub struct Query {
     pub fields: super::Fields,
+    pub filters: Option<super::Filter>,
     pub order_by: Option<super::OrderBy>,
     pub limit: Option<u32>,
     pub offset: Option<u32>,
@@ -19,18 +20,16 @@ impl Query {
         let fields = super::Fields::from_user_query(&query)
             .expect("Only queries with fields are currently supported");
 
+        let filters = super::Filter::from_user_query(&query)?;
         let order_by = super::OrderBy::from_user_query(&query);
 
         if let Some(_) = query.aggregates {
             return Err("Aggregation queries are not yet supported.".to_string());
         }
 
-        if let Some(_) = query.predicate {
-            return Err("Filtering is not yet supported.".to_string());
-        }
-
         Ok(Query {
             fields,
+            filters,
             limit: query.limit,
             offset: query.offset,
             order_by,
@@ -68,6 +67,11 @@ impl Query {
             }
 
             parameters.insert("$expand".to_string(), expansions.join(","));
+        }
+
+        if let Some(predicate) = &self.filters {
+            let predicate = super::Filter::to_odata_filter(predicate);
+            parameters.insert("$filter".to_string(), predicate);
         }
 
         if let Some(super::order_by::OrderBy(elements)) = &self.order_by {

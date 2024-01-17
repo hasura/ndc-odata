@@ -1,5 +1,6 @@
 //! Functions relating to NDC collections.
 
+use crate::odata;
 use crate::odata::schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -13,37 +14,31 @@ use std::collections::BTreeMap;
 pub struct Collection {
     pub name: String,
     pub key: String,
-    pub collection_type: String,
+    pub collection_type: super::QualifiedType,
     pub relationships: BTreeMap<String, String>, // navigation property => collection
 }
 
 impl Collection {
     /// OData's notion of entity sets maps pretty neatly onto the NDC notion of collections, so for
     /// now, we just transform one into the other.
-    pub fn extract_from(schema: &schema::Schema) -> Vec<Collection> {
+    pub fn extract_from(metadata: &odata::EDMX, schema: &schema::Schema) -> Vec<Collection> {
         let mut collections = BTreeMap::new();
 
         for entity_set in &schema.entity_container.entity_sets {
-            let entity_type = match entity_set
-                .entity_type
-                .split('.')
-                .collect::<Vec<_>>()
-                .as_slice()
-            {
-                [parent, name] if parent == &schema.namespace.as_str() => name,
-                _ => "entity sets can only have (qualified) types from the same schema.",
-            };
-
             // For now, we have that the metadata is valid, and we panic if it doesn't exist.
-            // Eventually, it would be nice to do a validation pass over the OData metadata /before/ we
-            // build the connector metadata, just for the sake of error messages.
-            let key = schema
-                .entity_type(&entity_type)
+            // Eventually, it would be nice to do a validation pass over the OData metadata
+            // /before/ we build the connector metadata, just for the sake of error messages.
+            let key = metadata
+                .entity_type(&entity_set.entity_type)
                 .expect("Collection's entity type doesn't exist.")
-                .key(&schema);
+                .key_name(&metadata)
+                .to_string();
 
-            let collection_type = entity_set.entity_type.clone();
             let mut relationships = BTreeMap::new();
+            let collection_type = super::QualifiedType {
+                schema: entity_set.entity_type.schema.clone(),
+                name: entity_set.entity_type.name.clone()
+            };
 
             for relationship in &entity_set.navigation_property_bindings {
                 relationships.insert(relationship.path.clone(), relationship.target.clone());

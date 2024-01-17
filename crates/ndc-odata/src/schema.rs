@@ -1,4 +1,4 @@
-//! The `ndc-spec` schema for this OData endpoint.
+//! The handler for the `/schema` endpoint.
 
 pub mod collections;
 pub mod functions;

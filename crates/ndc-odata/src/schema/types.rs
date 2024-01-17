@@ -5,8 +5,8 @@ use std::collections::BTreeMap;
 /// Translate an `ndc-odata` type into an `ndc-spec` type. They're structured identically.
 pub fn translate_type(r#type: &ndc::Type) -> models::Type {
     match r#type {
-        ndc::Type::Named { name } => models::Type::Named {
-            name: name.to_string(),
+        ndc::Type::Qualified { qualified_type } => models::Type::Named {
+            name: format!("{}.{}", qualified_type.schema, qualified_type.name)
         },
 
         ndc::Type::Nullable { underlying_type } => models::Type::Nullable {

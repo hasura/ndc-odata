@@ -18,7 +18,7 @@ pub struct EntitySet {
     pub name: String,
 
     #[serde(rename = "@EntityType")]
-    pub entity_type: String,
+    pub entity_type: super::QualifiedType,
 
     #[serde(default)]
     #[serde(rename = "NavigationPropertyBinding")]
@@ -32,9 +32,6 @@ pub struct EntitySet {
 /// bind as a target must have type `T`.
 #[derive(Clone, Debug, Deserialize)]
 pub struct NavigationPropertyBinding {
-    // @TODO: how do paths actually work? If I have some type `Person`, some subtype `Employee`,
-    // and I bind an entity set `People` of type `Person` to have an `Employee` navigation
-    // property, do I get a relationship only for any `Person` I can cast to an `Employee`?
     #[serde(rename = "@Path")]
     pub path: String,
 
@@ -46,6 +43,9 @@ pub struct NavigationPropertyBinding {
 /// type of a row in a table (an entity set). Entity types can be keyed (unlike compex types), and
 /// may extend another entity type, which means they inherit all the fields and navigation
 /// properties of the underlying type.
+///
+/// @TODO: it would be nice, internally, to reuse `ComplexType` and `flatten` the structure with
+/// `serde`, but `serde` didn't like this. We'll come back to it.
 #[derive(Clone, Debug, Deserialize)]
 pub struct EntityType {
     #[serde(rename = "@Name")]
@@ -55,7 +55,7 @@ pub struct EntityType {
     pub key: Option<Key>,
 
     #[serde(rename = "@BaseType")]
-    pub base_type: Option<String>,
+    pub base_type: Option<super::QualifiedType>,
 
     #[serde(default)]
     #[serde(rename = "Property")]
@@ -67,28 +67,79 @@ pub struct EntityType {
 }
 
 impl EntityType {
-    pub fn key(&self, schema: &super::schema::Schema) -> String {
-        if let Some(key) = &self.key {
-            key.property_ref.name.clone()
-        } else if let Some(base) = &self.base_type {
-            schema.entity_type(base).unwrap().key(schema)
-        } else {
-            // @TODO: this is a bit of a shame; a better approach would be to parse the metadata
-            // XML, then traverse the graph to verify some invariants (including this one), and
-            // maybe during that process we can replace every `Option<Key>` with a `Key`, entirely
-            // removing the need for this check to be here.
-            panic!(
-                "Entity type {} has neither a key nor a base type.",
-                self.name
-            )
+    /// Get all the fields from the type and the chain of base types.
+    pub fn fields(&self, metadata: &super::EDMX) -> Vec<super::Property> {
+        let mut collection = Vec::new();
+        collection.append(&mut self.properties.clone());
+
+        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.entity_type(&x)) {
+            collection.append(&mut target.fields(&metadata))
+        }
+
+        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.complex_type(&x)) {
+            collection.append(&mut target.fields(&metadata))
+        }
+
+        collection
+    }
+
+    /// Get all the navigation properties from the type and the chain of base types.
+    pub fn navigation_properties(&self, metadata: &super::EDMX) -> Vec<super::NavigationProperty> {
+        let mut collection = Vec::new();
+        collection.append(&mut self.navigation_properties.clone());
+
+        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.entity_type(&x)) {
+            collection.append(&mut target.navigation_properties(&metadata))
+        }
+
+        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.complex_type(&x)) {
+            collection.append(&mut target.navigation_properties(&metadata))
+        }
+
+        collection
+    }
+
+    /// Get the name of the key for this entity type, potentially checking through the base type
+    /// ancestry to find it.
+    pub fn key_name(&self, metadata: &super::EDMX) -> String {
+        match &self.key {
+            Some(key) => key.property_ref.name.clone(),
+            None => match &self.base_type {
+                Some(base_type) => match metadata.entity_type(&base_type) {
+                    Some(entity_type) => entity_type.key_name(metadata).to_string(),
+                    None => panic!("Can't find base type for {}", self.name),
+                },
+                None => panic!("Key type {} has neither a key nor a base type", self.name),
+            },
+        }
+    }
+
+    /// Get the type of the key in this entity type. If the entity type has a key, we look up the
+    /// type of that key in all the fields of the current entity and its ancestors. If it doesn't,
+    /// we have to look up the base type ancestors to find a key.
+    pub fn key_type(&self, metadata: &super::EDMX) -> super::QualifiedType {
+        match &self.key {
+            Some(key) => self
+                .fields(metadata)
+                .iter()
+                .find(|property| property.name == key.property_ref.name)
+                .unwrap()
+                .underlying_type()
+                .clone(),
+            None => match &self.base_type {
+                Some(base_type) => match metadata.entity_type(&base_type) {
+                    Some(entity) => entity.key_type(metadata),
+                    None => panic!("Base type {} doesn't exist", base_type.to_string()),
+                },
+
+                None => panic!("Key type {} has neither a key nor a base type", self.name),
+            },
         }
     }
 }
 
 /// The "key" of an entity type. This is the unique identifier of any given resource within the
 /// entity set, and we can think of it as a primary key.
-/// @TODO: can we have multiple keys? If so, are we saying that the combination of those keys must
-///        be unique, or that the entity set has two unique indices?
 #[derive(Clone, Debug, Deserialize)]
 pub struct Key {
     #[serde(rename = "PropertyRef")]
@@ -130,8 +181,6 @@ pub struct EntityContainer {
 
 /// Singletons are conceptually equivalent to nullary functions within the NDC vocabulary: they are
 /// defined at the entity container level, and return a singular row.
-///
-/// @TODO: are they necessarily nullary?
 #[derive(Clone, Debug, Deserialize)]
 pub struct Singleton {
     #[serde(rename = "@Name")]

@@ -42,16 +42,15 @@ pub async fn update_configuration(
 pub async fn validate_raw_configuration(
     configuration: ndc::RawConfiguration,
 ) -> Result<ndc::Configuration, connector::ValidateError> {
-    match ndc::Endpoint::parse(&configuration.api_endpoint) {
-        Ok(uri) => Ok(metadata::ndc::Configuration {
-            api_endpoint: uri,
-            schema: configuration.schema,
-        }),
-        Err(message) => Err({
-            let path = Vec::from([connector::KeyOrIndex::Key("api_endpoint".to_string())]);
-            let invalid_range = connector::InvalidRange { path, message };
+    let parsed = ndc::Endpoint::parse(&configuration.api_endpoint).map_err(|message| {
+        let path = Vec::from([connector::KeyOrIndex::Key("api_endpoint".to_string())]);
+        let invalid_range = connector::InvalidRange { path, message };
 
-            connector::ValidateError::ValidateError(Vec::from([invalid_range]))
-        }),
-    }
+        connector::ValidateError::ValidateError(Vec::from([invalid_range]))
+    })?;
+
+    Ok(metadata::ndc::Configuration {
+        api_endpoint: parsed,
+        schema: configuration.schema,
+    })
 }

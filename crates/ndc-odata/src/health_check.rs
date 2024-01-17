@@ -1,4 +1,4 @@
-//! Connector health check functions.
+//! The handler for the `/health` endpoint.
 
 use ndc_sdk::connector;
 

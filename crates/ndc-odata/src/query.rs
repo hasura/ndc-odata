@@ -1,12 +1,14 @@
-//! The query "engine": creates requests and interprets responses.
+//! The handler for the `/query` endpoint.
 
 pub mod fields;
+pub mod filters;
 pub mod order_by;
 pub mod query;
 pub mod request;
 pub mod response;
 
 pub use fields::*;
+pub use filters::*;
 pub use order_by::*;
 pub use query::*;
 pub use request::*;

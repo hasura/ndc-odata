@@ -7,17 +7,14 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 /// A complex type is the analogous to an NDC object type: it is a product type comprised of named
 /// fields that we'll represent using JSON objects. They may be built by extending other types.
-/// @TODO: can complex types have navigation properties?
 #[derive(Clone, Debug, Deserialize)]
 pub struct ComplexType {
     #[serde(rename = "@Name")]
     pub name: String,
 
-    // @TODO: we should expand base types as soon as possible: right now, for
-    // example, if the `key` of an entity type is a property on the base type,
-    // we'll crash.
+    #[serde(default)]
     #[serde(rename = "@BaseType")]
-    pub base_type: Option<String>,
+    pub base_type: Option<super::QualifiedType>,
 
     #[serde(default)]
     #[serde(rename = "Property")]
@@ -26,6 +23,40 @@ pub struct ComplexType {
     #[serde(default)]
     #[serde(rename = "NavigationProperty")]
     pub navigation_properties: Vec<NavigationProperty>,
+}
+
+impl ComplexType {
+    /// Get all the fields from the type and the chain of base types.
+    pub fn fields(&self, metadata: &super::EDMX) -> Vec<super::Property> {
+        let mut collection = Vec::new();
+        collection.append(&mut self.properties.clone());
+
+        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.entity_type(&x)) {
+            collection.append(&mut target.fields(&metadata))
+        }
+
+        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.complex_type(&x)) {
+            collection.append(&mut target.fields(&metadata))
+        }
+
+        collection
+    }
+
+    /// Get all the navigation properties from the type and the chain of base types.
+    pub fn navigation_properties(&self, metadata: &super::EDMX) -> Vec<super::NavigationProperty> {
+        let mut collection = Vec::new();
+        collection.append(&mut self.navigation_properties.clone());
+
+        if let Some(target) = &self.base_type.as_ref().and_then(|x| metadata.entity_type(&x)) {
+            collection.append(&mut target.navigation_properties(&metadata))
+        }
+
+        if let Some(target) = &self.base_type.as_ref().and_then(|x| metadata.complex_type(&x)) {
+            collection.append(&mut target.navigation_properties(&metadata))
+        }
+
+        collection
+    }
 }
 
 /// An available navigation property. Entity sets may choose to bind this property to a different
@@ -50,9 +81,11 @@ pub struct Property {
 }
 
 impl Property {
-    /// Get the underlying type of a property: the `Named` string at the bottom of the `Type`
-    /// stack.
-    pub fn underlying_type(&self) -> String {
+    /// Get the underlying type of a property: the `Named` string at the bottom of the `Property`
+    /// stack. We do this because the `ndc-spec` requires us to declare all types upfront, and
+    /// doesn't consider collections or nullable versions of types to be distinct types in their
+    /// own right. Thus, we only need to detect the underlying type.
+    pub fn underlying_type(&self) -> &QualifiedType {
         self.r#type.underlying_type()
     }
 }
@@ -72,16 +105,17 @@ pub struct TypeData {
 }
 
 impl TypeData {
-    /// Get the underlying type of a property: the `Named` string at the bottom of the `Type`
-    /// stack.
-    pub fn underlying_type(&self) -> String {
+    /// Get the underlying type of a property: the `Named` string at the bottom of the `TypeData`
+    /// stack. We do this because the `ndc-spec` requires us to declare all types upfront, and
+    /// doesn't consider collections or nullable versions of types to be distinct types in their
+    /// own right. Thus, we only need to detect the underlying type.
+    pub fn underlying_type(&self) -> &QualifiedType {
         self.inner.underlying_type()
     }
 }
 
-/// OData has a relatively simple type structure: there are named types and collections of types.
-/// Even the primitive types in an OData API are provided as named types in the `Edm` schema, and
-/// so they can be treated in the same way.
+/// If we ignore nullability  - in OData, this is a feature of the user of the type, not the type
+/// itself - a type is either a schema-qualified type, _or_ an heterogeneous collection.
 #[derive(Clone, Debug, JsonSchema, Parser)]
 #[grammar = "../grammars/type_name.pest"]
 pub enum Type {
@@ -89,40 +123,23 @@ pub enum Type {
     Collection { elements: Box<Type> },
 
     /// A singular type defined in some schema.
-    Qualified { schema: String, name: String },
+    Qualified { qualified_type: QualifiedType },
 }
 
 impl Type {
-    /// Pull out the scalar type name within a `Type`.
-    pub fn underlying_type(&self) -> String {
+    /// Find the underlying type within any number of 'Collection' layers.
+    pub fn underlying_type(&self) -> &QualifiedType {
         match &self {
             Type::Collection { elements } => elements.underlying_type(),
-            Type::Qualified { schema, name } => format!("{schema}.{name}"),
-        }
-    }
-
-    // @TODO: this is a real wart. The problem is that a type is implicitly
-    // namespaced by the schema in which it is declared, _but_ every reference
-    // to it will be /expicitly/ namespaced. Ideally, what we'd do is parse the
-    // OData metadata and add the schema namespace to every type we parse as
-    // we parse it. However, that would mean dealing with Serde's dark corners.
-    //
-    // Instead, for now, we assume that the APIs we're interested in will live
-    // within a single schema, so we're always safe to strip the schema because
-    // it should always be the right one anyway. This is not a good long-term
-    // solution.
-    pub fn schemaless_name(&self) -> String {
-        match &self {
-            Type::Collection { elements } => elements.schemaless_name(),
-            Type::Qualified { schema: _, name } => name.clone(),
+            Type::Qualified { qualified_type } => qualified_type,
         }
     }
 
     /// A helper method to print an OData type in the OData format.
-    pub fn as_string(&self) -> String {
+    pub fn to_string(&self) -> String {
         match self {
-            Type::Collection { elements } => format!("Collection({})", elements.as_string()),
-            Type::Qualified { schema, name } => format!("{schema}.{name}"),
+            Type::Collection { elements } => format!("Collection({})", elements.to_string()),
+            Type::Qualified { qualified_type } => qualified_type.to_string(),
         }
     }
 }
@@ -139,7 +156,37 @@ impl<'de> Deserialize<'de> for Type {
 
 impl Serialize for Type {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(&self.as_string())
+        serializer.serialize_str(&self.to_string())
+    }
+}
+
+/// Specifically, a scalar type (i.e. not a collection) that belongs to some schema.
+#[derive(Clone, Debug, JsonSchema)]
+pub struct QualifiedType {
+    pub schema: String,
+    pub name: String,
+}
+
+impl QualifiedType {
+    pub fn to_string(&self) -> String {
+        format!("{}.{}", self.schema, self.name)
+    }
+}
+
+impl<'de> Deserialize<'de> for QualifiedType {
+    /// This is very lazy: we parse the type as a regular type and forbid the `Collection` variant.
+    /// We should write this type its own deserializer.
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let type_string = String::deserialize(deserializer)?;
+        let pairs = Type::parse(Rule::type_name, &type_string).map_err(serde::de::Error::custom)?;
+
+        match read_type_pairs::<D>(pairs)? {
+            Type::Qualified { qualified_type } => Ok(qualified_type),
+            Type::Collection { elements: _ } => Err(serde::de::Error::invalid_value(
+                serde::de::Unexpected::Str(&type_string),
+                &"a non-collection type",
+            )),
+        }
     }
 }
 
@@ -173,9 +220,11 @@ fn read_type_pairs<'de, D: Deserializer<'de>>(
         }
     }
 
-    // We guarantee non-emptiness in the grammar, so this should also never fail.
-    let name = components.pop().unwrap().to_string();
-    let schema = components.join(".");
+    let qualified_type = QualifiedType {
+        // We guarantee non-emptiness in the grammar, so this should also never fail.
+        name: components.pop().expect("Parsed an empty type").to_string(),
+        schema: components.join("."),
+    };
 
-    Ok(Type::Qualified { schema, name })
+    Ok(Type::Qualified { qualified_type })
 }

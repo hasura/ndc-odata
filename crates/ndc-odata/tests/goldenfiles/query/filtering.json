@@ -1,0 +1,36 @@
+{
+  "endpoint": "http://localhost:8100/query",
+  "method": "POST",
+  "data": {
+    "collection": "People",
+    "arguments": {},
+    "query": {
+        "fields": {
+            "first_name": {
+                "type": "column",
+                "column": "FirstName"
+            },
+            "last_name": {
+                "type": "column",
+                "column": "LastName"
+            }
+        },
+        "where": {
+            "type": "binary_comparison_operator",
+            "column": {
+                "type": "column",
+                "name": "LastName",
+                "path": []
+            },
+            "operator": {
+                "type": "equal"
+            },
+            "value": {
+                "type": "scalar",
+                "value": "Osborn"
+            }
+        }
+    },
+    "collection_relationships": {}
+  }  
+}

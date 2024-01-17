@@ -1,4 +1,4 @@
-//! Functions relating to extracting scalar types.
+//! Functions relating to extracting scalar types from OData metadata.
 
 use crate::odata::{schema, types};
 use schemars::JsonSchema;
@@ -16,14 +16,14 @@ impl ScalarType {
     /// should refer to types declared in the root of the schema as either entity types or complex
     /// types, so we don't bother traversing into them.
     pub fn extract_from(schema: &schema::Schema) -> BTreeSet<ScalarType> {
+        //  We don't want to show all the primitive types unless we need to, because it'll just
+        //  pollute the GraphQL schema. So, we only declare scalar types that we find while
+        //  traversing the API schema.
         let mut scalar_types = BTreeSet::new();
 
-        //  We don't want to show all the primitive types unless we need to, because it'll just
-        //  pollute the GraphQL schema. So, we ignore all primitive types that don't appear in the
-        //  schema.
         for entity_type in &schema.entity_types {
             for property in &entity_type.properties {
-                let underlying_type = property.underlying_type();
+                let underlying_type = property.underlying_type().to_string();
 
                 if PRIMITIVE_TYPES.contains(&underlying_type.as_str()) {
                     scalar_types.insert(ScalarType(underlying_type));
@@ -33,7 +33,7 @@ impl ScalarType {
 
         for complex_type in &schema.complex_types {
             for property in &complex_type.properties {
-                let underlying_type = property.underlying_type();
+                let underlying_type = property.underlying_type().to_string();
 
                 if PRIMITIVE_TYPES.contains(&underlying_type.as_str()) {
                     scalar_types.insert(ScalarType(underlying_type));
@@ -46,13 +46,26 @@ impl ScalarType {
 }
 
 /// Types as described in the `ndc-spec`: we reify collections and nullability as separate
-/// constructors of the type.
+/// constructors of the type. We also require that all types be namespaced.
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 #[serde(tag = "type")]
 pub enum Type {
     Collection { element_type: Box<Type> },
     Nullable { underlying_type: Box<Type> },
-    Named { name: String },
+    Qualified { qualified_type: QualifiedType },
+}
+
+/// Qualified types that state both the schema and name of the type to which they refer.
+#[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
+pub struct QualifiedType {
+    pub schema: String,
+    pub name: String
+}
+
+impl QualifiedType {
+    pub fn to_string(&self) -> String {
+        format!("{}.{}", self.schema, self.name)
+    }
 }
 
 impl Type {
@@ -89,8 +102,14 @@ impl Type {
                 }
             }
 
-            types::TypeData { inner, .. } => Type::Named {
-                name: inner.underlying_type(),
+            types::TypeData {
+                inner: types::Type::Qualified { qualified_type },
+                ..
+            } => Type::Qualified {
+                qualified_type: QualifiedType {
+                    schema: qualified_type.schema.clone(),
+                    name: qualified_type.name.clone(),
+                }
             },
         }
     }

@@ -16,7 +16,9 @@ pub fn get_details(
         .map_err(Box::from)
         .map_err(connector::ExplainError::Other)?;
 
-    Ok(models::ExplainResponse {
-        details: BTreeMap::from([("query".to_string(), request_url)]),
-    })
+    // @TODO: we could add a few more details in here using OData context.
+    let mut details = BTreeMap::new();
+    details.insert("query".to_string(), request_url);
+
+    Ok(models::ExplainResponse { details })
 }

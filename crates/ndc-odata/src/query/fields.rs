@@ -7,13 +7,13 @@ pub struct Original(pub String);
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Alias(pub String);
 
-#[derive(Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Eq, PartialEq)]
 pub struct Fields {
     pub columns: BTreeMap<Alias, Original>,
     pub relationships: BTreeMap<Alias, Relationship>,
 }
 
-#[derive(Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Eq, PartialEq)]
 pub struct Relationship {
     pub query: super::Query,
     pub relationship: String,

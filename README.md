@@ -4,7 +4,7 @@ A Native Data Connector (NDC) for OData APIs, specifically for those adhering
 to [OData v4.01](https://docs.oasis-open.org/odata/odata/v4.01/).
 
 See the `example/` directory for sample metadata corresponding to the OData
-reference service: [TripPin](https://services.odata.org/V4/TripPinServiceRW).
+reference service: [TripPin](https://services.odata.org/TripPinRESTierService).
 
 ## Getting started
 
@@ -35,6 +35,11 @@ from the [`ndc-spec` list](https://hasura.github.io/ndc-spec).
 - [X] Queries
     - [X] Field Selection
     - [ ] Filtering
+      - [X] Equality with scalars
+      - [X] Equality between local columns
+      - [ ] Equality with root columns
+      - [X] Nullability checks
+      - [ ] Existential predicates
     - [X] Sorting
     - [X] Pagination
     - [ ] Aggregates
