@@ -36,7 +36,7 @@ impl Fields {
                         relationship,
                         arguments: _,
                     } => {
-                        let query = super::Query::from_user_query(&*query)?;
+                        let query = super::Query::from_user_query(query)?;
                         let relationship = relationship.clone();
 
                         relationships.insert(

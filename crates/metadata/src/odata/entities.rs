@@ -72,12 +72,20 @@ impl EntityType {
         let mut collection = Vec::new();
         collection.append(&mut self.properties.clone());
 
-        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.entity_type(&x)) {
-            collection.append(&mut target.fields(&metadata))
+        if let Some(target) = self
+            .base_type
+            .as_ref()
+            .and_then(|x| metadata.entity_type(x))
+        {
+            collection.append(&mut target.fields(metadata))
         }
 
-        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.complex_type(&x)) {
-            collection.append(&mut target.fields(&metadata))
+        if let Some(target) = self
+            .base_type
+            .as_ref()
+            .and_then(|x| metadata.complex_type(x))
+        {
+            collection.append(&mut target.fields(metadata))
         }
 
         collection
@@ -88,12 +96,20 @@ impl EntityType {
         let mut collection = Vec::new();
         collection.append(&mut self.navigation_properties.clone());
 
-        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.entity_type(&x)) {
-            collection.append(&mut target.navigation_properties(&metadata))
+        if let Some(target) = self
+            .base_type
+            .as_ref()
+            .and_then(|x| metadata.entity_type(x))
+        {
+            collection.append(&mut target.navigation_properties(metadata))
         }
 
-        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.complex_type(&x)) {
-            collection.append(&mut target.navigation_properties(&metadata))
+        if let Some(target) = self
+            .base_type
+            .as_ref()
+            .and_then(|x| metadata.complex_type(x))
+        {
+            collection.append(&mut target.navigation_properties(metadata))
         }
 
         collection
@@ -105,7 +121,7 @@ impl EntityType {
         match &self.key {
             Some(key) => key.property_ref.name.clone(),
             None => match &self.base_type {
-                Some(base_type) => match metadata.entity_type(&base_type) {
+                Some(base_type) => match metadata.entity_type(base_type) {
                     Some(entity_type) => entity_type.key_name(metadata).to_string(),
                     None => panic!("Can't find base type for {}", self.name),
                 },
@@ -127,9 +143,9 @@ impl EntityType {
                 .underlying_type()
                 .clone(),
             None => match &self.base_type {
-                Some(base_type) => match metadata.entity_type(&base_type) {
+                Some(base_type) => match metadata.entity_type(base_type) {
                     Some(entity) => entity.key_type(metadata),
-                    None => panic!("Base type {} doesn't exist", base_type.to_string()),
+                    None => panic!("Base type {} doesn't exist", base_type),
                 },
 
                 None => panic!("Key type {} has neither a key nor a base type", self.name),

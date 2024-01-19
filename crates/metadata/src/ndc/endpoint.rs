@@ -11,10 +11,33 @@ pub struct Endpoint {
     pub path: String,
 }
 
+impl std::fmt::Display for Endpoint {
+    /// ```
+    /// let endpoint = metadata::ndc::Endpoint {
+    ///   protocol: "http".to_string(),
+    ///   authority: "example.com".to_string(),
+    ///   path: "/test".to_string()
+    /// };
+    ///
+    /// assert_eq!(endpoint.to_string(), "http://example.com/test")
+    /// ```
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let result = Uri::builder()
+            .scheme(self.protocol.as_str())
+            .authority(self.authority.as_str())
+            .path_and_query(self.path.as_str());
+
+        match result.build() {
+            Ok(success) => write!(formatter, "{success}"),
+            Err(_ignore) => Err(std::fmt::Error),
+        }
+    }
+}
+
 impl Endpoint {
     /// Parse a URL string into an `Endpoint` structure. We do this via the `http::Uri` builder,
     /// and then break it up again (because we can't `Serialise`/`Deserialise` the builder itself).
-    pub fn parse(input: &String) -> Result<Self, String> {
+    pub fn parse(input: &str) -> Result<Self, String> {
         let uri = input.parse::<Uri>().map_err(|x| x.to_string())?;
 
         let protocol: String = match uri.scheme_str() {
@@ -37,16 +60,5 @@ impl Endpoint {
             authority,
             path,
         })
-    }
-
-    /// Turn an `Endpoint` structure into a URL string.
-    pub fn to_string(&self) -> String {
-        Uri::builder()
-            .scheme(self.protocol.as_str())
-            .authority(self.authority.as_str())
-            .path_and_query(self.path.as_str())
-            .build()
-            .expect("Failed to re-parse a valid URL")
-            .to_string()
     }
 }

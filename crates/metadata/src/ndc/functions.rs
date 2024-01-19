@@ -20,7 +20,7 @@ impl Function {
             let result_type = super::Type::from_type_data(&function.return_type);
 
             for functions::Parameter { name, r#type } in &function.parameters {
-                arguments.insert(name.clone(), super::Type::from_type_data(&r#type));
+                arguments.insert(name.clone(), super::Type::from_type_data(r#type));
             }
 
             functions.push(ndc::Function {

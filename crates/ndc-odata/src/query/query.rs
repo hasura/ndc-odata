@@ -17,13 +17,13 @@ impl Query {
     // This method effectively just separates the two types of field and also strips any parts of
     // the query that we don't support yet.
     pub fn from_user_query(query: &models::Query) -> Result<Self, String> {
-        let fields = super::Fields::from_user_query(&query)
+        let fields = super::Fields::from_user_query(query)
             .expect("Only queries with fields are currently supported");
 
-        let filters = super::Filter::from_user_query(&query)?;
-        let order_by = super::OrderBy::from_user_query(&query);
+        let filters = super::Filter::from_user_query(query)?;
+        let order_by = super::OrderBy::from_user_query(query);
 
-        if let Some(_) = query.aggregates {
+        if query.aggregates.is_some() {
             return Err("Aggregation queries are not yet supported.".to_string());
         }
 
@@ -50,7 +50,7 @@ impl Query {
         let query_fields = &self.odata_fields().iter().join(", ");
         parameters.insert("$select".to_string(), query_fields.clone());
 
-        if self.fields.relationships.len() > 0 {
+        if !self.fields.relationships.is_empty() {
             let mut expansions = Vec::new();
 
             // A bit of a nuisance - query components are separated in the top-level query with

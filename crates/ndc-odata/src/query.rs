@@ -3,7 +3,8 @@
 pub mod fields;
 pub mod filters;
 pub mod order_by;
-pub mod query;
+#[allow(clippy::module_inception)]
+pub mod query; // We can remove module inception when we fully move to use NDC requests.
 pub mod request;
 pub mod response;
 

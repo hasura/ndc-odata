@@ -21,10 +21,10 @@ impl Procedure {
         for action in &schema.actions {
             if let Some(return_type) = &action.return_type {
                 let mut arguments = BTreeMap::new();
-                let result_type = super::types::Type::from_type_data(&return_type);
+                let result_type = super::types::Type::from_type_data(return_type);
 
                 for functions::Parameter { name, r#type } in &action.parameters {
-                    arguments.insert(name.clone(), ndc::types::Type::from_type_data(&r#type));
+                    arguments.insert(name.clone(), ndc::types::Type::from_type_data(r#type));
                 }
 
                 procedures.push(ndc::Procedure {

@@ -31,12 +31,20 @@ impl ComplexType {
         let mut collection = Vec::new();
         collection.append(&mut self.properties.clone());
 
-        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.entity_type(&x)) {
-            collection.append(&mut target.fields(&metadata))
+        if let Some(target) = self
+            .base_type
+            .as_ref()
+            .and_then(|x| metadata.entity_type(x))
+        {
+            collection.append(&mut target.fields(metadata))
         }
 
-        if let Some(target) = self.base_type.as_ref().and_then(|x| metadata.complex_type(&x)) {
-            collection.append(&mut target.fields(&metadata))
+        if let Some(target) = self
+            .base_type
+            .as_ref()
+            .and_then(|x| metadata.complex_type(x))
+        {
+            collection.append(&mut target.fields(metadata))
         }
 
         collection
@@ -47,12 +55,20 @@ impl ComplexType {
         let mut collection = Vec::new();
         collection.append(&mut self.navigation_properties.clone());
 
-        if let Some(target) = &self.base_type.as_ref().and_then(|x| metadata.entity_type(&x)) {
-            collection.append(&mut target.navigation_properties(&metadata))
+        if let Some(target) = &self
+            .base_type
+            .as_ref()
+            .and_then(|x| metadata.entity_type(x))
+        {
+            collection.append(&mut target.navigation_properties(metadata))
         }
 
-        if let Some(target) = &self.base_type.as_ref().and_then(|x| metadata.complex_type(&x)) {
-            collection.append(&mut target.navigation_properties(&metadata))
+        if let Some(target) = &self
+            .base_type
+            .as_ref()
+            .and_then(|x| metadata.complex_type(x))
+        {
+            collection.append(&mut target.navigation_properties(metadata))
         }
 
         collection
@@ -134,12 +150,14 @@ impl Type {
             Type::Qualified { qualified_type } => qualified_type,
         }
     }
+}
 
+impl std::fmt::Display for Type {
     /// A helper method to print an OData type in the OData format.
-    pub fn to_string(&self) -> String {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Type::Collection { elements } => format!("Collection({})", elements.to_string()),
-            Type::Qualified { qualified_type } => qualified_type.to_string(),
+            Type::Collection { elements } => write!(formatter, "Collection({})", elements),
+            Type::Qualified { qualified_type } => qualified_type.fmt(formatter),
         }
     }
 }
@@ -167,9 +185,9 @@ pub struct QualifiedType {
     pub name: String,
 }
 
-impl QualifiedType {
-    pub fn to_string(&self) -> String {
-        format!("{}.{}", self.schema, self.name)
+impl std::fmt::Display for QualifiedType {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "{}.{}", self.schema, self.name)
     }
 }
 

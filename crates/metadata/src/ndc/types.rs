@@ -59,12 +59,12 @@ pub enum Type {
 #[derive(Clone, Debug, Deserialize, JsonSchema, Serialize)]
 pub struct QualifiedType {
     pub schema: String,
-    pub name: String
+    pub name: String,
 }
 
-impl QualifiedType {
-    pub fn to_string(&self) -> String {
-        format!("{}.{}", self.schema, self.name)
+impl std::fmt::Display for QualifiedType {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "{}.{}", self.schema, self.name)
     }
 }
 
@@ -109,7 +109,7 @@ impl Type {
                 qualified_type: QualifiedType {
                     schema: qualified_type.schema.clone(),
                     name: qualified_type.name.clone(),
-                }
+                },
             },
         }
     }

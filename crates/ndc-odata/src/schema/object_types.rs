@@ -6,7 +6,7 @@ pub fn translate((name, object_type): (&String, &ndc::ObjectType)) -> (String, m
     let mut fields = BTreeMap::new();
 
     for (field_name, field_type) in &object_type.fields {
-        let r#type = super::types::translate_type(&field_type);
+        let r#type = super::types::translate_type(field_type);
         let description = None;
 
         fields.insert(

@@ -33,7 +33,7 @@ impl ObjectType {
 
             object_types.insert(
                 object_type.to_string(),
-                from_entity_type(metadata, &entity_type),
+                from_entity_type(metadata, entity_type),
             );
         }
 
@@ -47,7 +47,7 @@ impl ObjectType {
 
             object_types.insert(
                 object_type.to_string(),
-                from_complex_type(metadata, &complex_type),
+                from_complex_type(metadata, complex_type),
             );
         }
 
@@ -60,16 +60,12 @@ fn from_complex_type(metadata: &odata::EDMX, structure: &odata::ComplexType) -> 
     let mut fields = BTreeMap::new();
 
     if let Some(base_type) = &structure.base_type {
-        match metadata.complex_type(&base_type) {
+        match metadata.complex_type(base_type) {
             Some(complex_type) => {
                 let mut inner = from_complex_type(metadata, &complex_type);
                 fields.append(&mut inner.fields);
             }
-            None => panic!(
-                "{}'s base type {} doesn't exist",
-                structure.name,
-                base_type.to_string()
-            ),
+            None => panic!("{}'s base type {} doesn't exist", structure.name, base_type),
         }
     }
 
@@ -113,7 +109,7 @@ fn navigation_properties(
 
     for navigation_property in navigation_properties {
         let target_type = navigation_property.r#type.inner.underlying_type();
-        let target = metadata.entity_type(&target_type).clone().unwrap();
+        let target = metadata.entity_type(target_type).clone().unwrap();
 
         let qualified_type = target.key_type(metadata);
         fields.insert(
@@ -122,7 +118,7 @@ fn navigation_properties(
                 qualified_type: super::QualifiedType {
                     schema: qualified_type.schema.clone(),
                     name: qualified_type.name.clone(),
-                }
+                },
             },
         );
     }
