@@ -17,7 +17,7 @@ impl OrderBy {
             order_by.push(OrderByElement {
                 order_direction: element.order_direction,
                 target: match &element.target {
-                    models::OrderByTarget::Column { name, path } if path.len() == 0 => name.clone(),
+                    models::OrderByTarget::Column { name, path } if path.is_empty() => name.clone(),
                     _ => return None,
                 },
             });

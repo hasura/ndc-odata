@@ -1,5 +1,17 @@
+check-my-pr:
+  @just clippy
+  @just check-format
+  @just machete
+  @just build
+  @just test
+alias pr := check-my-pr
+
 build:
   @cargo build
+
+clippy:
+  @cargo clippy
+alias lint := clippy
 
 format:
   @cargo fmt --all

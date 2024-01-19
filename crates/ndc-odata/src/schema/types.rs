@@ -6,15 +6,15 @@ use std::collections::BTreeMap;
 pub fn translate_type(r#type: &ndc::Type) -> models::Type {
     match r#type {
         ndc::Type::Qualified { qualified_type } => models::Type::Named {
-            name: format!("{}.{}", qualified_type.schema, qualified_type.name)
+            name: format!("{}.{}", qualified_type.schema, qualified_type.name),
         },
 
         ndc::Type::Nullable { underlying_type } => models::Type::Nullable {
-            underlying_type: Box::new(translate_type(&*underlying_type)),
+            underlying_type: Box::new(translate_type(underlying_type)),
         },
 
         ndc::Type::Collection { element_type } => models::Type::Array {
-            element_type: Box::new(translate_type(&*element_type)),
+            element_type: Box::new(translate_type(element_type)),
         },
     }
 }
@@ -31,7 +31,7 @@ pub fn translate_arguments(
         results.insert(
             argument_name.clone(),
             models::ArgumentInfo {
-                argument_type: translate_type(&argument_type),
+                argument_type: translate_type(argument_type),
                 description: None,
             },
         );

@@ -31,13 +31,13 @@ impl Collection {
             let key = metadata
                 .entity_type(&entity_set.entity_type)
                 .expect("Collection's entity type doesn't exist.")
-                .key_name(&metadata)
+                .key_name(metadata)
                 .to_string();
 
             let mut relationships = BTreeMap::new();
             let collection_type = super::QualifiedType {
                 schema: entity_set.entity_type.schema.clone(),
-                name: entity_set.entity_type.name.clone()
+                name: entity_set.entity_type.name.clone(),
             };
 
             for relationship in &entity_set.navigation_property_bindings {

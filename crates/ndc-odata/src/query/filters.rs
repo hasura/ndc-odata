@@ -33,7 +33,7 @@ pub enum ComparisonValue {
 impl Filter {
     pub fn from_user_query(query: &models::Query) -> Result<Option<Self>, String> {
         match &query.predicate {
-            Some(predicate) => Self::from_predicate(&predicate).map(Some),
+            Some(predicate) => Self::from_predicate(predicate).map(Some),
             None => Ok(None),
         }
     }
@@ -84,16 +84,12 @@ impl Filter {
                 column: _,
                 operator: _,
                 values: _,
-            } => {
-                return Err("Binary array comparison operators are not yet supported.".to_string());
-            }
+            } => Err("Binary array comparison operators are not yet supported.".to_string()),
 
             models::Expression::Exists {
                 in_collection: _,
                 predicate: _,
-            } => {
-                return Err("Existential queries are not yet supported.".to_string());
-            }
+            } => Err("Existential queries are not yet supported.".to_string()),
 
             models::Expression::BinaryComparisonOperator {
                 column,
@@ -107,7 +103,7 @@ impl Filter {
                 let comparison_value = match value {
                     models::ComparisonValue::Column { column } => match column {
                         models::ComparisonTarget::Column { name, path } => {
-                            if path.len() > 0 {
+                            if !path.is_empty() {
                                 return Err("Column paths not yet supported.".to_string());
                             }
 
@@ -132,7 +128,7 @@ impl Filter {
 
                 let column = match column {
                     models::ComparisonTarget::Column { name, path } => {
-                        if path.len() > 0 {
+                        if !path.is_empty() {
                             return Err("Column paths not yet supported.".to_string());
                         }
 
@@ -189,7 +185,7 @@ impl Filter {
                     value: serde_json::Value::String(s),
                 } => format!("({} eq '{}')", column, s.clone()),
                 ComparisonValue::Scalar { value } => {
-                    format!("({} eq {})", column, value.to_string())
+                    format!("({} eq {})", column, value)
                 }
             },
         }
